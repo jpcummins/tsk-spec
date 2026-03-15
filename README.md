@@ -14,6 +14,10 @@ breaking changes are clearly communicated.
 This repo does not contain an implementation. It is for specs, documentation,
 and examples for the task management system.
 
+The intent is for task tracking data to live in its own repository, separate
+from application code, to keep git history clean. This is not required; the
+system is flexible enough to live alongside a codebase in the same repo.
+
 ## Principles
 - Fast by default; no heavy infrastructure required.
 - Developer-first UX; text is the source of truth.
@@ -34,21 +38,3 @@ and examples for the task management system.
 ## Examples
 - `example/minimal-todo/` shows a minimal solo TODO list.
 - `example/complex-shopping-cart/` shows a multi-team, SLA-tracked project.
-
-## Vision and Requirements
-- Replace heavier task tracking systems (e.g., ClickUp, Linear) with a developer-first tool.
-- Minimal, text-file based (Markdown) with front matter.
-- Git as the version control system for project data.
-- CLI-first interaction; future web UI for reporting and org-level visibility.
-
-## Core Principles
-- Plain text storage; diff-friendly and human-readable.
-- Minimal schema, but strong reporting capability.
-- Works for single-person projects up to multi-team, multi-organization scale.
-- `tsk` data lives in a separate git repo from work code.
-- Eventually integrate with external repos (possibly via submodules or references).
-
-## Open Questions / TBD
-- Integration approach with external repos (submodules vs references).
-- Roll-up strategy configurations and UX.
-- CLI command surface and behavior.
