@@ -1,6 +1,6 @@
 # TSK Formal Spec (Draft)
 
-Version: 0.11.0
+Version: 0.12.0
 
 ## Versioning
 - The spec follows semantic versioning.
@@ -20,6 +20,7 @@ It is implementation-agnostic and focused on structure, fields, and semantics.
 - Canonical task paths are rooted at the `tasks/` directory.
 - Stub files redirect moved tasks to their new paths.
 - Top-level layout:
+  - `.config.toml` is optional (root configuration; may include `version`).
   - `tasks/` is required and is the root for canonical task paths.
   - `teams/` is optional.
   - `sla.toml` is optional.
@@ -253,6 +254,20 @@ Goals and notes.
 - Project configuration files live in project directories and apply to that
   directory subtree.
 - A global configuration may exist at the repository root (`.config.toml`).
+
+### Repository Version
+- The root `.config.toml` may include a `version` field specifying the
+  spec version the repository conforms to (semver string, e.g., `"0.12.0"`).
+- `version` is only valid at the repository root; it is ignored in
+  subdirectory configs.
+- `version` is optional. If absent, implementations should assume the
+  latest version they support and warn.
+- Implementations should error if the repository version is newer than
+  what they support.
+- Implementations may use `version` to apply migrations when upgrading
+  a repository to a newer spec version.
+
+### Inheritance
 - When multiple configs apply, the most specific (nearest) config takes
   precedence.
 - Configurations are deep-merged by section; nearest values override outer values.
@@ -267,6 +282,8 @@ Goals and notes.
 
 ### Configuration example
 ```toml
+version = "0.12.0"
+
 [defaults]
 assignee = "jp@example.com"
 status = "up_next"
@@ -293,9 +310,10 @@ done = { category = "done", order = 50 }
 ```
 
 ## 11. Roll-ups
-- Parent roll-ups are supported.
-- Default roll-up strategy is percent complete.
-- Roll-up behavior can be configured in parent front matter.
+- Implementations may compute derived metrics (e.g., percent complete,
+  estimate totals) from subtask data.
+- The spec does not prescribe roll-up behavior; this is an
+  implementation concern.
 
 ## 12. SLAs
 - SLA rules are defined globally in `sla.toml`.
@@ -344,7 +362,10 @@ severity = "medium"
 #### Rule fields
 - `id` (string): unique within the file.
 - `name` (string): human-readable label.
-- `query` (string): SLA query language expression.
+- `query` (string): SLA query language expression (Section 12.1).
+  SLA rule queries may reference `task.*` and `iteration.*` fields
+  but must not reference `sla.*` fields, as SLA results do not exist
+  at rule evaluation time.
 - `target` (duration): allowed time window.
 - `start` (string): start event (`date`, `due`, `status:<value>`).
 - `stop` (string): stop event (`status:<value>` or `due`).
@@ -407,10 +428,18 @@ It is declarative, human-readable, and stable across implementations.
 - Predicates against missing fields are no-ops and evaluate to false.
 
 ### 12.1.4 Fields
-These fields are available for SLA queries:
+These fields are available for queries:
 - Fields may be namespaced by entity: `task.<field>` or `iteration.<field>`.
 - Unqualified fields apply to tasks by default.
-- `sla.<field>` is available only in reporting contexts after SLA evaluation.
+- `sla.<field>` is available only in reporting contexts after SLA
+  evaluation. SLA fields are task-scoped — they attach to the task that
+  matched the SLA rule. They compose with `task.*` and `iteration.*`
+  predicates using the same rules below.
+- When a query references both `task.*` and `iteration.*` fields, it
+  returns tasks that belong to at least one iteration satisfying the
+  iteration predicates. The iteration's `tasks` list defines membership.
+  Task predicates (including `sla.*`) are then applied to filter the
+  matching tasks.
 - Task fields:
   - `task.status` (custom status)
   - `task.status.category` (base category: `todo`, `in_progress`, `done`)
