@@ -1,0 +1,17 @@
+[[rule]]
+id = "support-7d"
+name = "Support bugs resolved in 7 days"
+query = 'task.summary ~ "support"'
+target = "7d"
+start = "date"
+stop = "status:done"
+severity = "high"
+
+[[rule]]
+id = "incident-4h"
+name = "Incidents mitigated in 4 hours"
+query = 'task.summary ~ "incident"'
+target = "4h"
+start = "status:in_progress"
+stop = "status:done"
+severity = "critical"

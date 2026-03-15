@@ -1,0 +1,6 @@
+[status.map]
+todo = { category = "todo", order = 10 }
+queued = { category = "todo", order = 20 }
+dev = { category = "in_progress", order = 30 }
+ready = { category = "in_progress", order = 40 }
+done = { category = "done", order = 50 }
