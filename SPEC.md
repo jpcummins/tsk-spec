@@ -1,6 +1,6 @@
 # TSK Formal Spec (Draft)
 
-Version: 0.10.0
+Version: 0.11.0
 
 ## Versioning
 - The spec follows semantic versioning.
@@ -116,6 +116,7 @@ Tasks are the atomic unit. A task is a Markdown file with front matter.
 - `status` (custom enum mapped to base categories)
 - `updated_at` (RFC3339 timestamp)
 - `status_log` (ordered list of `{status, at}` transitions)
+- `labels` (list of strings; arbitrary tags for categorization)
 - `weight`
 
 ### Reference Resolution
@@ -132,6 +133,17 @@ Tasks are the atomic unit. A task is a Markdown file with front matter.
   `teams/`.
 - Reassignment (e.g., team triages and assigns to a person) is modeled by
   updating the `assignee` value.
+
+### Labels
+- `labels` is an optional list of freeform strings.
+- Labels are case-insensitive for query matching.
+- Labels inherit from parent tasks with union semantics: a child's labels
+  are merged with its parent's labels, not replaced. This is an exception
+  to the general array replacement rule in Section 10.
+- Labels inherit automatically — no `[inherit]` opt-in is required.
+- A label on a project `README.md` applies to all subtasks in that
+  directory tree.
+- Queryable via `has(labels, "value")` for membership checks.
 
 ### Status Semantics
 - `status` represents the current status when `status_log` is absent.
@@ -150,6 +162,7 @@ assignee: "alex@example.com"
 dependencies: ["launch/plan", "bootstrap"]
 summary: "Ship CLI MVP"
 estimate: "12h"
+labels: ["capitalizable", "mvp"]
 status: "up_next"
 status_log:
   - status: todo
@@ -244,6 +257,7 @@ Goals and notes.
   precedence.
 - Configurations are deep-merged by section; nearest values override outer values.
 - Arrays and lists are replaced (not merged) by nearer configs.
+  Exception: `labels` use union semantics (see Section 5, Labels).
 - Configuration can define default field values.
 - Defaults apply to all tasks in the current project directory and recursively.
 - Task front matter overrides inherited values.
@@ -408,6 +422,7 @@ These fields are available for SLA queries:
   - `task.path` (canonical path relative to `tasks/`, no file extension)
   - `task.summary`
   - `task.dependency` (matches any dependency path)
+  - `task.labels` (matches any label value)
 - Iteration fields:
   - `iteration.team` (team directory name)
   - `iteration.status` (custom status)
@@ -433,6 +448,7 @@ These fields are available for SLA queries:
 - `task.path`: string (canonical path relative to `tasks/`)
 - `task.summary`: string
 - `task.dependency`: list of strings (canonical paths)
+- `task.labels`: list of strings
 - `iteration.team`: string (team directory name)
 - `iteration.status`: enum (custom status value)
 - `iteration.status.category`: enum (`todo`, `in_progress`, `done`)
@@ -487,6 +503,8 @@ These fields are available for SLA queries:
   `iteration.status = in_progress AND iteration.start <= date("today")`
 - SLA breach reporting query:
   `sla.id = "security-30d" AND sla.status = "breached"`
+- Completed capitalizable tasks:
+  `has(labels, "capitalizable") AND status.category = done`
 
 ### 12.1.8 Redirect Stub Handling
 - Queries operate on resolved canonical tasks.
