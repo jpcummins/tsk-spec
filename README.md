@@ -6,7 +6,7 @@ Jira, ClickUp, and Linear. This repository defines the specification of a tsk re
 
 The core idea is simple: 
 
-* Tasks are markdown files with header metadata
+* Tasks are markdown files
 * Tasks belong to projects, which are directories with an optional readme.md
 
 A simple tsk repository looks like this:
