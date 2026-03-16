@@ -64,7 +64,7 @@ It is implementation-agnostic and focused on structure, fields, and semantics.
 
 ### 2.4 Redirect Stub Files
 - Redirect stubs are the only reference mechanism in the system.
-- When a task is moved, the old path should remain as a stub file.
+- When a task is moved, the old path may optionally remain as a stub file. This is an implementation decision.
 - Cross-links are represented as stub files that point to a canonical task.
 - Stub files are Markdown files with front matter containing `redirect_to`.
 - `redirect_to` must be a canonical path (no file extension) relative to
