@@ -1,6 +1,6 @@
-# TSK Spec
+# tsk
 
-TSK is a fast, developer-first, non-proprietary, file-based project management
+tsk is a fast, developer-first, non-proprietary, file-based project management
 spec. It is intentionally minimal and a bit of a rebellion against the bloat of
 Jira, ClickUp, and Linear. The core idea is simple: tasks and project data live
 in plain text files, tracked in git, with tooling built around a stable, open
@@ -14,23 +14,21 @@ breaking changes are clearly communicated.
 This repo does not contain an implementation. It is for specs, documentation,
 and examples for the task management system.
 
+The intent is for a tsk repository to live in its own git repo, separate
+from application code, to keep git history clean. This is not required; the
+system is flexible enough to live alongside a codebase in the same repo.
+
 ## Implementations
 
 - **[tsk-cli](https://github.com/jpcummins/tsk-cli)** - Terminal UI with DSL queries and fuzzy search
 - **[tsk-lib](https://github.com/jpcummins/tsk-lib)** - Go library for parsing and querying tsk repositories
 
-The intent is for task tracking data to live in its own repository, separate
-from application code, to keep git history clean. This is not required; the
-system is flexible enough to live alongside a codebase in the same repo.
 
 ## Principles
-- Fast by default; no heavy infrastructure required.
-- Developer-first UX; text is the source of truth.
-- Non-proprietary formats and portable data.
-- Minimal surface area with strong reporting.
+- Instantaneous search.
+- Text is the source of truth.
+- Clear specification for humans and AI.
 - Scales from solo dev workflows to large multi-org teams.
-- No API or servers required; just edit plain text files.
-- A clear spec enables robust implementations for non-technical users.
 
 ## Spec and Versioning
 - The formal spec lives in `SPEC.md`.
