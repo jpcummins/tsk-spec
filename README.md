@@ -2,16 +2,49 @@
 
 tsk is a fast, developer-first, non-proprietary, file-based project management
 specification. It is intentionally minimal and a bit of a rebellion against the bloat of
-Jira, ClickUp, and Linear. The core idea is simple: tasks and project data live
-in plain text files, tracked in git, with tooling built around a stable, open
-specification. It should scale from a single-developer workflow to a complex
-multi-org setup at a large company.
+Jira, ClickUp, and Linear. This repository defines the specification of the tsk repository and contains documentation and examples.  This repo does not contain an implementation. 
 
-This repository defines the specification of the tsk repository, documentation, and examples.  This repo does not contain an implementation. 
+The core idea is simple: 
+
+* Tasks are basic markdown files with some header metadata
+* Tasks belong to projects, which are directories with an optional readme.md
+
+A simple tsk repository looks like this:
+```
+/
+  .config.toml
+  tasks/
+    project-a/
+      README.md
+      task-1.md
+      task-2.md
+    project-b/
+      README.md
+      task-1.md
+      task-2.md
+      task-3.md
+      project-b-big-subtask/
+        README.md
+        task-1.md
+        task-2.md
+        task-3.md
+```
+
+Optionally, you can add additional functionality (described in the spec):
+
+* teams
+* iterations
+* SLAs
+
+The primary way to interact with tsk is via the query interface, though, implementations are free to abstract this away to make a clean UI for non-technical users. For example, to find all open bugs in the `support` project:
+
+```
+path ~ "support/" AND status.category != done
+```
 
 The intent is for a tsk repository to live in its own git repo, separate
-from application code, to keep git history clean. This is not required; the
-system is flexible enough to live alongside a codebase in the same repo.
+from application code, to keep the application's git history clean. This is not required; the
+system is flexible enough to live alongside a codebase in the same repo. Client applications may commit and push changes transparently to the user.
 
 ## Implementations
 
