@@ -30,7 +30,7 @@ A simple tsk repository looks like this:
         task-3.md
 ```
 
-Optionally, you can add additional functionality (see [shopping cart example](example/complex-shopping-cart/README.md):
+Optionally, you can add additional functionality (see [shopping cart example](example/complex-shopping-cart/README.md)):
 
 * teams
 * iterations
