@@ -1,6 +1,6 @@
 # tsk spec
 
-Version: 1.1.0
+Version: 1.2.0
 
 ## Versioning
 - The spec follows semantic versioning.
@@ -148,14 +148,7 @@ Tasks are the atomic unit. A task is a Markdown file with front matter.
 - Labels inherit automatically — no `[inherit]` opt-in is required.
 - A label on a project `README.md` applies to all subtasks in that
   directory tree.
-- Queryable via `has(labels, "value")` for membership checks.
-
-### Status Semantics
-- `status` represents the current status when `change_log` is absent.
-- If `change_log` is present, the most recent status change defines current status.
-- If `change_log` timestamps are out of order, the most recent timestamp wins.
-- If `status` is provided but `updated_at` is missing, SLA enforcement is not
-  possible for status-based rules.
+  - Queryable via `has(labels, "value")` for membership checks.
 
 ### Example
 ```markdown
