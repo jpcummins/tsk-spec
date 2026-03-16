@@ -52,8 +52,8 @@ system is flexible enough to live alongside a codebase in the same repo. Client 
 - **[tsk-lib](https://github.com/jpcummins/tsk-lib)** - Go library for parsing and querying tsk repositories
 
 ## Examples
-- `example/minimal-todo/` shows a minimal solo TODO list.
-- `example/complex-shopping-cart/` shows a multi-team, SLA-tracked project.
+- [example/minimal-todo](example/minimal-todo/) shows a minimal solo TODO list.
+- [example/complex-shopping-cart](example/complex-shopping-cart/) shows a multi-team, SLA-tracked project.
 
 ## Future Plans
 - A CLI tool to create, update, and delete tasks
