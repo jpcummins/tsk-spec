@@ -65,7 +65,7 @@ It is implementation-agnostic and focused on structure, fields, and semantics.
 ### 2.4 Redirect Stub Files
 - Redirect stubs are the only reference mechanism in the system.
 - When a task is moved, the old path may optionally remain as a stub file. This is an implementation decision.
-- Cross-links are represented as stub files that point to a canonical task.
+- If a task needs to appear in multiple locations, use a redirect stub instead of duplicating the task file.
 - Stub files are Markdown files with front matter containing `redirect_to`.
 - `redirect_to` must be a canonical path (no file extension) relative to
   `tasks/`.
@@ -83,10 +83,7 @@ redirect_to: launch/phase-1/implement-cli
 ---
 ```
 
-#### Cross-link stub example
-Use a cross-link stub when the same task needs to appear in multiple places
-without creating a duplicate task record.
-
+#### Using a redirect stub to reference a task from multiple locations
 ```markdown
 ---
 redirect_to: platform/tasks/enable-sso
