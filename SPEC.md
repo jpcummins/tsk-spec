@@ -1,6 +1,6 @@
 # tsk spec
 
-Version: 1.2.1
+Version: 2.0.0
 
 ## Versioning
 - The spec follows semantic versioning.
@@ -130,12 +130,15 @@ Tasks are the atomic unit. A task is a Markdown file with front matter.
 ### Assignee Semantics
 - `assignee` is a single string representing the current owner of a task.
 - A task is assigned to either a person or a team, never both.
-- Person values are an email address or alphanumeric username token
-  (e.g., `"alex@example.com"`, `"jp"`).
+- Person values can be:
+  - An email address (e.g., `"alex@example.com"`)
+  - A team member identifier from `team.toml` (e.g., `"alice"`)
 - Team values use the `team:` prefix followed by a team directory name
   (e.g., `"team:backend"`).
 - The team name in a `team:` value must correspond to a directory under
   `teams/`.
+- Implementations resolve member identifiers to their full name and email
+  from the team's `team.toml`.
 - Reassignment (e.g., team triages and assigns to a person) is modeled by
   updating the `assignee` value.
 
@@ -193,16 +196,29 @@ Notes here...
 - Team-level configuration is stored in `teams/<team>/team.toml`.
 
 ### Team Members
-- Team members are listed in `team.toml` under the `members` key.
-- `members` is an array of strings in `"First Last <email@example.com>"` format.
-- The `members` field is optional.
+- Team members are listed in `team.toml` under the `[members]` table.
+- Each member entry is: `identifier = "value"`.
+- The value can be one of:
+  - Name and email: `"First Last <email@example.com>"`
+  - Name only: `"First Last"`
+  - Email only: `"email@example.com"`
+- All member identifiers follow **Identifier Syntax**.
+- Member identifiers can be used in task `assignee` fields.
+- The `members` table is optional.
+- When resolving a member identifier in `assignee`, implementations search all
+  teams. If found in multiple teams with different values, the lexically first
+  team directory name takes priority.
+- If the member identifier cannot be found, implementations may emit a warning
+  or info.
+- If the value contains a name or email, implementations may extract and use
+  these separately for display purposes.
 
 ### team.toml example
 ```toml
-members = [
-  "Alice Smith <alice@example.com>",
-  "Bob Jones <bob@example.com>",
-]
+[members]
+alice = "Alice Smith <alice@example.com>"
+bob = "Bob Jones"
+charlie = "charlie@example.com"
 ```
 
 ## 9. Iterations

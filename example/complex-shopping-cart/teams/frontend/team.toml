@@ -1,8 +1,7 @@
-members = [
-  "Alice Smith <alice@example.com>",
-  "Bob Jones <bob@example.com>",
-  "Carol White <carol@example.com>",
-]
+[members]
+alice = "Alice Smith <alice@example.com>"
+bob = "Bob Jones <bob@example.com>"
+carol = "Carol White <carol@example.com>"
 
 [iteration.status.map]
 todo = { category = "todo", order = 10 }

@@ -1,0 +1,11 @@
+[members]
+sarah = "Sarah Chen <sarah@example.com>"
+mike = "Mike Johnson"
+david = "david@example.com"
+
+[iteration.status.map]
+todo = { category = "todo", order = 10 }
+queued = { category = "todo", order = 20 }
+in_progress = { category = "in_progress", order = 30 }
+review = { category = "in_progress", order = 40 }
+done = { category = "done", order = 50 }

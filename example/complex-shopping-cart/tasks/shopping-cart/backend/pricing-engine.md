@@ -2,7 +2,7 @@
 date: 2026-03-17T11:00:00Z
 updated_at: 2026-03-20T09:00:00Z
 status: in_progress
-assignee: "sarah@example.com"
+assignee: "sarah"
 summary: "Pricing engine"
 estimate: "10h"
 change_log:
