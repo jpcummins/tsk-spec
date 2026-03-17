@@ -1,6 +1,6 @@
 # tsk spec
 
-Version: 1.0.1
+Version: 1.1.0
 
 ## Versioning
 - The spec follows semantic versioning.
@@ -381,7 +381,7 @@ severity = "medium"
 #### Rule fields
 - `id` (identifier; see **Identifier Syntax**): unique within the file.
 - `name` (string): human-readable label.
-- `query` (string): SLA query language expression (Section 12.1).
+- `query` (string): query language expression (Section 13).
   SLA rule queries may reference `task.*` and `iteration.*` fields
   but must not reference `sla.*` fields, as SLA results do not exist
   at rule evaluation time.
@@ -411,21 +411,23 @@ severity = "medium"
 - Status values may be custom task statuses; they map to base categories via
   status mapping.
 
-## 12.1 SLA Query Language (DSL)
-The SLA query language is a domain-specific language for selecting tasks.
+## 13. Query Language (DSL)
+The query language is a domain-specific language for selecting tasks.
 It is declarative, human-readable, and stable across implementations.
+It serves as the baseline DSL for search, SLA rules, reporting, and
+saved views across the system.
 
-### 12.1.1 Goals
+### 13.1 Goals
 - Express task selection using task fields and derived attributes.
 - Support boolean logic, grouping, and negation.
 - Be safe and deterministic (no side effects, no execution).
 
-### 12.1.2 Grammar (Conceptual)
+### 13.2 Grammar (Conceptual)
 - `expr := term ( ("AND" | "OR") term )*`
 - `term := "NOT"? (predicate | "(" expr ")")`
 - `predicate := field op value | function`
 
-### 12.1.2.1 Grammar (BNF)
+### 13.2.1 Grammar (BNF)
 ```
 <expr>       ::= <term> ( ("AND" | "OR") <term> )*
 <term>       ::= ["NOT"] ( <predicate> | "(" <expr> ")" )
@@ -437,31 +439,31 @@ It is declarative, human-readable, and stable across implementations.
 <args>       ::= <value> ("," <value>)*
 ```
 
-### 12.1.2.2 Precedence and Associativity
+### 13.2.2 Precedence and Associativity
 - Precedence: `NOT` > `AND` > `OR`.
 - Operators of the same precedence evaluate left-to-right.
 
-### 12.1.3 Operators
+### 13.3 Operators
 - Equality: `=`
 - Inequality: `!=`
 - Ordering: `<`, `<=`, `>`, `>=` (for dates, numbers, durations)
 - Containment: `~` (substring or token contains, case-insensitive)
 - Set membership: `IN` (comma-separated list)
 
-### 12.1.3.1 Operator Type Rules
+### 13.3.1 Operator Type Rules
 - Ordering operators apply only to comparable types: dates, numbers, and durations.
 - Enumerations (e.g., `status`, `status.category`) support only `=`, `!=`, and `IN`.
 - Non-comparable predicates (e.g., `status < "foo"`) are invalid and must error.
 - Predicates against missing fields are no-ops and evaluate to false.
 
-### 12.1.4 Fields
+### 13.4 Fields
 These fields are available for queries:
 - Fields may be namespaced by entity: `task.<field>` or `iteration.<field>`.
 - Unqualified fields apply to tasks by default.
 - `sla.<field>` is available only in reporting contexts after SLA
-  evaluation. SLA fields are task-scoped — they attach to the task that
-  matched the SLA rule. They compose with `task.*` and `iteration.*`
-  predicates using the same rules below.
+  evaluation (see Section 12). SLA fields are task-scoped — they attach
+  to the task that matched the SLA rule. They compose with `task.*` and
+  `iteration.*` predicates using the same rules below.
 - When a query references both `task.*` and `iteration.*` fields, it
   returns tasks that belong to at least one iteration satisfying the
   iteration predicates. The iteration's `tasks` list defines membership.
@@ -487,14 +489,14 @@ These fields are available for queries:
   - `iteration.start` (RFC3339)
   - `iteration.end` (RFC3339)
   - `iteration.path` (canonical path relative to `tasks/`, no file extension)
-- SLA fields (reporting only):
+- SLA fields (reporting only; see Section 12):
   - `sla.id` (SLA rule id)
   - `sla.status` (enum: `ok`, `at_risk`, `breached`)
   - `sla.target` (duration; see **Duration Format**)
   - `sla.elapsed` (duration; see **Duration Format**)
   - `sla.remaining` (duration; see **Duration Format**)
 
-### 12.1.4.1 Field Type Reference
+### 13.4.1 Field Type Reference
 - `task.status`: enum (custom status value)
 - `task.status.category`: enum (`todo`, `in_progress`, `done`)
 - `task.assignee`: string (person or `team:` prefixed team name)
@@ -519,7 +521,7 @@ These fields are available for queries:
 - `sla.elapsed`: duration (see **Duration Format**)
 - `sla.remaining`: duration (see **Duration Format**)
 
-### 12.1.5 Functions
+### 13.5 Functions
 - `exists(field)`
 - `missing(field)`
 - `has(field, value)` (list membership; e.g., dependency)
@@ -534,11 +536,12 @@ These fields are available for queries:
   and all members for every team the user is in. A user may belong to
   multiple teams.)
 
-### 12.1.6 Values
+### 13.6 Values
 - Strings can be quoted with double quotes, e.g. `"security"`.
 - Dates use RFC3339, e.g. `2026-04-01T17:00:00Z`.
 - Relative date strings are allowed only inside `date(...)`.
-### 12.1.6.1 Duration Format
+
+### 13.6.1 Duration Format
 - Duration format: `<number><unit>`, e.g., `2h`, `1.5d`, `30m`, `2w`.
 - Decimal values allowed (e.g., `1.5h`, `0.5d`).
 - Supported units:
@@ -549,7 +552,7 @@ These fields are available for queries:
 - Durations may be positive or negative (negative values indicate past offsets).
 - No spaces allowed between number and unit.
 
-### 12.1.7 Examples
+### 13.7 Examples
 - All security tasks with a 30-day SLA:
   `summary ~ "security" AND status.category != done`
 - Tasks assigned to specific people and due this week:
@@ -569,16 +572,16 @@ These fields are available for queries:
 - Completed capitalizable tasks:
   `has(labels, "capitalizable") AND status.category = done`
 
-### 12.1.8 Redirect Stub Handling
+### 13.8 Redirect Stub Handling
 - Queries operate on resolved canonical tasks.
 - Stub files are not matchable records and are excluded from search results.
 - If a query input path references a stub, it resolves to the target task before matching.
 
-## 13. Reporting Expectations
+## 14. Reporting Expectations
 - Reporting spans tasks, projects, initiatives, teams, iterations, and SLAs.
 - Virtual nodes (directories without README.md) appear in reports as normal.
 
-## 14. Search as a Core Primitive
+## 15. Search as a Core Primitive
 - Search is a first-class capability across CLI, web UI, and API.
-- The SLA query language is the baseline DSL for search across the system.
+- The query language (Section 13) is the baseline DSL for search across the system.
 - All major views should be expressible as saved or ad-hoc queries.

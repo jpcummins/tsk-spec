@@ -22,7 +22,7 @@ dependencies, iterations, and SLA-tracked support/incident work.
 
 ## Useful Search Queries
 
-These examples use the SLA query language from the spec. All queries
+These examples use the query language from the spec (Section 13). All queries
 reference data in this example as of 2026-03-19. See `sla.toml` for
 the SLA rules applied to support and incident tasks.
 

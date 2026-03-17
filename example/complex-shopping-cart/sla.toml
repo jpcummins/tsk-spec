@@ -12,6 +12,7 @@ id = "incident-4h"
 name = "Incidents mitigated in 4 hours"
 query = 'task.summary ~ "incident"'
 target = "4h"
+warn_at = "2h"
 start = "status:in_progress"
 stop = "status:done"
 severity = "critical"
