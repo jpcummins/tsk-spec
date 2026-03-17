@@ -14,8 +14,8 @@ teams/
 
 - Iterations live under `teams/<team>/iterations/`.
 - An iteration is a Markdown file with ordered task references.
-- The team is derived from the directory path.
-- Task references are canonical paths relative to `tasks/` (no file extensions).
+- The [team](teams.md) is derived from the directory path.
+- Task references are [canonical paths](basics.md#canonical-paths) relative to `tasks/` (no file extensions).
 - A task may belong to multiple iterations.
 
 ## Iteration ID
@@ -28,11 +28,11 @@ Use the body of the file for descriptive text.
 
 ## Fields
 
-| Field   | Type    | Description                           |
-| ------- | ------- | ------------------------------------- |
-| `start` | RFC3339 | Start of the iteration time window.   |
-| `end`   | RFC3339 | End of the iteration time window.     |
-| `tasks` | list    | Ordered list of canonical task paths. |
+| Field   | Type       | Description                           |
+| ------- | ---------- | ------------------------------------- |
+| `start` | RFC3339    | Start of the iteration time window.   |
+| `end`   | RFC3339    | End of the iteration time window.     |
+| `tasks` | list       | Ordered list of canonical task paths. |
 
 ## Example
 

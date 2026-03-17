@@ -26,7 +26,7 @@ tsk search uses a DSL for filtering tasks, iterations, and SLA results.
 | `exists(field)`     | True if field is present          |
 | `missing(field)`    | True if field is absent           |
 | `has(field, value)` | True if list field contains value |
-| `date(value)`       | Convert to RFC3339                |
+| `date(value)`       | Convert to RFC3339 (see [basics.md](basics.md#duration-rules)) |
 | `team(name)`        | Expand to team members            |
 | `me()`              | Current user identifier           |
 | `my_team()`         | All teams current user belongs to |
@@ -43,19 +43,19 @@ tsk search uses a DSL for filtering tasks, iterations, and SLA results.
 | `due`             | datetime   | RFC3339 timestamp                               |
 | `created_at`      | datetime   | RFC3339 timestamp                               |
 | `updated_at`      | datetime   | RFC3339 timestamp                               |
-| `estimate`        | duration   | Estimated effort (e.g., `2h`, `1.5d`)           |
+| `estimate`        | [duration](basics.md#duration-rules) | Estimated effort (e.g., `2h`, `1.5d`) |
 | `path`            | string     | Canonical path relative to `tasks/`             |
 | `summary`         | string     | Task description                                |
-| `type`            | identifier | Task type identifier                            |
+| `type`            | [identifier](basics.md#identifier-rules) | Task type identifier |
 | `labels`          | list       | List of label identifiers                       |
-| `dependencies`    | list       | List of canonical paths                         |
+| `dependencies`    | list       | List of [canonical paths](basics.md#canonical-paths) |
 
 ### Iteration Fields
 
 | Field             | Type       | Description                              |
 | ----------------- | ---------- | ---------------------------------------- |
-| `iteration.id`    | string     | Derived identifier (`<team>/<filename>`) |
-| `iteration.team`  | identifier | Team identifier                          |
+| `iteration.id`    | string     | Derived identifier (`<team>/<filename>`, see [iterations.md](iterations.md#iteration-id)) |
+| `iteration.team`  | [identifier](basics.md#identifier-rules) | Team identifier |
 | `iteration.start` | datetime   | RFC3339 timestamp                        |
 | `iteration.end`   | datetime   | RFC3339 timestamp                        |
 
@@ -65,9 +65,9 @@ tsk search uses a DSL for filtering tasks, iterations, and SLA results.
 | --------------- | -------- | ------------------------------ |
 | `sla.id`        | string   | SLA rule id                    |
 | `sla.status`    | enum     | `ok`, `at_risk`, or `breached` |
-| `sla.target`    | duration | Target duration                |
-| `sla.elapsed`   | duration | Elapsed time                   |
-| `sla.remaining` | duration | Remaining time                 |
+| `sla.target`    | [duration](basics.md#duration-rules) | Target duration |
+| `sla.elapsed`   | [duration](basics.md#duration-rules) | Elapsed time |
+| `sla.remaining` | [duration](basics.md#duration-rules) | Remaining time |
 
 ## Examples
 

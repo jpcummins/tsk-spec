@@ -10,7 +10,7 @@ teams/
     team.toml
 ```
 
-- Team directory names are identifiers.
+- Team directory names are [identifiers](basics.md#identifier-rules).
 - Team config lives in `teams/<team>/team.toml`.
 
 ## Team Members
@@ -25,7 +25,7 @@ carol = "carol@example.com"
 ```
 
 - Key (`alice`, `bob`, `carol`) is the member identifier.
-- Member identifiers follow the standard identifier format.
+- Member identifiers follow the standard [identifier](basics.md#identifier-rules) format.
 - Values may be:
   - `"First Last <email@example.com>"`
   - `"First Last"`

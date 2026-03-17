@@ -43,7 +43,7 @@ redirect_to: platform/tasks/enable-sso
 |-------|------|----------|-------------|
 | `created_at` | datetime | yes | RFC3339 timestamp |
 | `due` | datetime | no | RFC3339 timestamp |
-| `assignee` | string | no | Person or team (e.g., `"alice"`, `"team:backend"`) |
+| `assignee` | string | no | Person or [team](teams.md) (e.g., `"alice"`, `"team:backend"`) |
 | `dependencies` | list | no | Canonical paths to predecessor tasks |
 | `summary` | string | no | Short task description |
 | `estimate` | duration | no | Estimated effort (e.g., `2h`, `1.5d`) |

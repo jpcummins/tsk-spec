@@ -22,14 +22,14 @@ severity = "high"
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | identifier | yes | Unique rule identifier |
+| `id` | [identifier](basics.md#identifier-rules) | yes | Unique rule identifier |
 | `name` | string | yes | Human-readable rule name |
 | `query` | string | yes | DSL expression to select matching tasks |
-| `target` | duration | yes | Breach threshold duration |
-| `warn_at` | duration | no | At-risk threshold duration |
+| `target` | [duration](basics.md#duration-rules) | yes | Breach threshold duration |
+| `warn_at` | [duration](basics.md#duration-rules) | no | At-risk threshold duration |
 | `start` | string | yes | Start event (`due` or `status:<value>`) |
 | `stop` | string | yes | Stop event (`due` or `status:<value>`) |
-| `severity` | identifier | yes | Reporting label identifier |
+| `severity` | [identifier](basics.md#identifier-rules) | yes | Reporting label identifier |
 
 ## Status Outcomes
 
@@ -42,7 +42,7 @@ When SLA timing is active:
 ## Validation Notes
 
 - `warn_at` must be between `0` and `target` (inclusive).
-- SLA IDs and severity values follow identifier rules.
+- SLA IDs and severity values follow [identifier](basics.md#identifier-rules) rules.
 
 ## Examples
 
