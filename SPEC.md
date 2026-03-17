@@ -375,7 +375,7 @@ severity = "medium"
 ```
 
 #### Rule fields
-- `id` (string): unique within the file.
+- `id` (identifier; see **Identifier Syntax**): unique within the file.
 - `name` (string): human-readable label.
 - `query` (string): SLA query language expression (Section 12.1).
   SLA rule queries may reference `task.*` and `iteration.*` fields
@@ -384,7 +384,7 @@ severity = "medium"
 - `target` (duration): allowed time window.
 - `start` (string): start event (`date`, `due`, `status:<value>`).
 - `stop` (string): stop event (`status:<value>` or `due`).
-- `severity` (string): reporting label (e.g., `low`, `medium`, `high`).
+- `severity` (identifier; see **Identifier Syntax**): reporting label.
 
 #### SLA Event Types
 - `date`: use `task.date`.
@@ -469,7 +469,7 @@ These fields are available for queries:
   - `task.dependency` (matches any dependency path)
   - `task.labels` (matches any label value)
 - Iteration fields:
-  - `iteration.team` (team directory name)
+  - `iteration.team` (identifier; see **Identifier Syntax**)
   - `iteration.status` (custom status)
   - `iteration.status.category` (base category: `todo`, `in_progress`, `done`)
   - `iteration.start` (RFC3339)
