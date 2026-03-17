@@ -333,7 +333,6 @@ done = { category = "done", order = 50 }
 
 ## 12. SLAs
 - SLA rules are defined globally in `sla.toml`.
-- Tasks may explicitly select or override SLA rules in front matter.
 - SLA applicability is defined by a search query in the rule.
 - SLA start/stop timing is configurable per rule.
 - If multiple SLA rules match a task, reporting behavior is configurable.
