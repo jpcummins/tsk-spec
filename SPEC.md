@@ -1,6 +1,6 @@
 # tsk spec
 
-Version: 1.1.1
+Version: 1.3.0
 
 ## Versioning
 - The spec follows semantic versioning.
@@ -430,13 +430,19 @@ saved views across the system.
 ```
 <expr>       ::= <term> ( ("AND" | "OR") <term> )*
 <term>       ::= ["NOT"] ( <predicate> | "(" <expr> ")" )
-<predicate>  ::= <field> <op> <value> | <function>
+<predicate>  ::= <field> <op> <value> | <pred-fn>
 <op>         ::= "=" | "!=" | "<" | "<=" | ">" | ">=" | "~" | "IN"
-<value>      ::= <string> | <number> | <date> | <duration> | <list>
+<value>      ::= <string> | <number> | <date> | <duration> | <list> | <value-fn>
 <list>       ::= "[" <value> ("," <value>)* "]"
-<function>   ::= <ident> "(" [<args>] ")"
+<pred-fn>    ::= <ident> "(" [<args>] ")"
+<value-fn>   ::= <ident> "(" [<args>] ")"
 <args>       ::= <value> ("," <value>)*
 ```
+
+Predicate functions (`<pred-fn>`) are standalone boolean terms.
+Value functions (`<value-fn>`) produce a value for use on the right
+side of an operator. See Section 13.5 for the specific functions in
+each category.
 
 ### 13.2.2 Precedence and Associativity
 - Precedence: `NOT` > `AND` > `OR`.
@@ -465,11 +471,13 @@ saved views across the system.
   - Invalid: `task.status = done OR iteration.status = in_progress`
 - AND across entity namespaces is allowed. This is the only way to
   combine predicates from different namespaces.
-- NOT applied to an `iteration.*` predicate negates the existence check:
-  it means "no matching iteration exists for this task," not "there
-  exists an iteration where the predicate is false."
+- NOT applied to an `iteration.*` or `sla.*` predicate negates the
+  existence check: it means "no matching entity exists for this task,"
+  not "there exists an entity where the predicate is false."
   - `NOT iteration.team = "backend" AND task.status.category = todo`
     returns todo tasks that are not in any backend iteration.
+  - `NOT sla.status = "breached" AND task.assignee = "alice"`
+    returns Alice's tasks where no SLA measurement is breached.
 
 ### 13.4 Fields
 These fields are available for queries:
@@ -479,6 +487,11 @@ These fields are available for queries:
   evaluation (see Section 12). SLA fields are task-scoped — they attach
   to the task that matched the SLA rule. They compose with `task.*` and
   `iteration.*` predicates using the same rules below.
+- A task may have multiple SLA measurements (one per matching rule).
+  `sla.*` predicates use existential semantics: a task matches if at
+  least one of its SLA measurements satisfies the predicates. Tasks
+  with no SLA measurements are excluded when `sla.*` predicates are
+  present.
 - When a query references both `task.*` and `iteration.*` fields, it
   returns tasks that belong to at least one iteration satisfying the
   iteration predicates. The iteration's `tasks` list defines membership.
@@ -541,19 +554,30 @@ These fields are available for queries:
 - `sla.remaining`: duration (see **Duration Format**)
 
 ### 13.5 Functions
-- `exists(field)`
-- `missing(field)`
-- `has(field, value)` (list membership; e.g., dependencies, labels)
-- `date(value)` (convert to RFC3339; e.g., `date("yesterday")`)
-- `team(name)` (expand to match `"team:<name>"` or any member listed in
-  `teams/<name>/team.toml` `members`; for use with `assignee`)
-- `me()` (resolve to the current user's identifier; for use with
-  `assignee`. Identity resolution is implementation-defined — e.g.,
-  git config, session, or environment.)
-- `my_team()` (resolve to all teams the current user belongs to, based
-  on `members` in each `team.toml`. Expands to match `"team:<name>"`
-  and all members for every team the user is in. A user may belong to
-  multiple teams.)
+
+#### 13.5.1 Predicate Functions
+Predicate functions are standalone boolean terms in the grammar
+(`<pred-fn>`). They cannot appear on the right side of an operator.
+
+- `exists(field)` — true if the field is present on the task.
+- `missing(field)` — true if the field is absent from the task.
+- `has(field, value)` — true if the list field contains the value
+  (list membership; e.g., dependencies, labels).
+
+#### 13.5.2 Value Functions
+Value functions produce a value for use on the right side of an
+operator (`<value-fn>`). They cannot be used as standalone predicates.
+
+- `date(value)` — convert to RFC3339 (e.g., `date("yesterday")`).
+- `team(name)` — expand to match `"team:<name>"` or any member listed
+  in `teams/<name>/team.toml` `members`; for use with `assignee`.
+- `me()` — resolve to the current user's identifier; for use with
+  `assignee`. Identity resolution is implementation-defined (e.g.,
+  git config, session, or environment).
+- `my_team()` — resolve to all teams the current user belongs to,
+  based on `members` in each `team.toml`. Expands to match
+  `"team:<name>"` and all members for every team the user is in. A
+  user may belong to multiple teams.
 
 ### 13.6 Values
 - Strings can be quoted with double quotes, e.g. `"security"`.
@@ -590,6 +614,22 @@ These fields are available for queries:
   `sla.id = "security-30d" AND sla.status = "breached"`
 - Completed capitalizable tasks:
   `has(labels, "capitalizable") AND status.category = done`
+- My open tasks:
+  `assignee = me() AND status.category != done`
+- Overdue tasks across my teams:
+  `assignee = my_team() AND due < date("today") AND status.category != done`
+- All tasks under a project subtree:
+  `path ~ "launch/phase-1"`
+- Bug tasks without a due date:
+  `type = "bug" AND NOT exists(due)`
+- Tasks in the current sprint that are blocked (waiting on dependencies):
+  `iteration.status = in_progress AND status = "blocked"`
+- At-risk SLAs for the platform team:
+  `sla.status = "at_risk" AND iteration.team = "platform"`
+- Tasks created in the last 7 days with no estimate:
+  `created_at >= date("-7d") AND missing(estimate)`
+- Things my team worked on last iteration:
+  `iteration.team = "backend" AND iteration.name = "2026 Week 11" AND status.category != todo`
 
 ### 13.8 Redirect Stub Handling
 - Queries operate on resolved canonical tasks.
