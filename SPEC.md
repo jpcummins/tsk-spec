@@ -1,6 +1,6 @@
 # tsk spec
 
-Version: 1.0.0
+Version: 1.0.1
 
 ## Versioning
 - The spec follows semantic versioning.
@@ -116,10 +116,10 @@ Tasks are the atomic unit. A task is a Markdown file with front matter.
 - `assignee` (string; a person or team — see **Assignee Semantics**)
 - `dependencies` (canonical paths relative to `tasks/`, without file extensions)
 - `summary` (use Hugo summary behavior)
-- `estimate` (duration tokens like `2h`, `1.5d`)
+- `estimate` (duration format like `2h`, `1.5d`; see **Duration Format**)
 - `status` (custom enum mapped to base categories)
 - `updated_at` (RFC3339 timestamp)
-- `change_log` (ordered list of `{field, from, to, at}` changes; tracks changes to any header field)
+- `change_log` (chronologically ordered list of `{field, from, to, at}` changes; tracks changes to any header field. Entries are ordered by `at` ascending. If entries share an identical `at` timestamp, list order is authoritative.)
 - `labels` (list of identifiers; see **Identifier Syntax**)
 - `type` (identifier; see **Identifier Syntax**)
 - `weight`
@@ -335,6 +335,10 @@ done = { category = "done", order = 50 }
 - SLA rules are defined globally in `sla.toml`.
 - SLA applicability is defined by a search query in the rule.
 - Each rule defines its own `start` and `stop` events (see Section 12.0.1).
+- SLA evaluation produces exactly one measurement per task per rule, using the
+  most recent start/stop pair. Prior cycles (e.g., a task that regressed and
+  re-entered a status) are not tracked by the spec; implementations may choose
+  to expose cycle history separately.
 - If multiple SLA rules match a task, reporting behavior is configurable.
 
 ### 12.0 SLA Rule Storage
@@ -381,7 +385,9 @@ severity = "medium"
   SLA rule queries may reference `task.*` and `iteration.*` fields
   but must not reference `sla.*` fields, as SLA results do not exist
   at rule evaluation time.
-- `target` (duration): allowed time window.
+- `target` (duration; see **Duration Format**): allowed time window.
+- `warn_at` (duration; see **Duration Format**): optional. If set, the SLA becomes `at_risk` when
+  elapsed time exceeds this threshold. Must be >= 0 and <= `target`.
 - `start` (string): start event (`date`, `due`, `status:<value>`).
 - `stop` (string): stop event (`status:<value>` or `due`).
 - `severity` (identifier; see **Identifier Syntax**): reporting label.
@@ -395,6 +401,12 @@ severity = "medium"
   `task.status` matches the requested value.
 - If `status` is set and `updated_at` is missing, status-based SLA timing
   cannot be enforced and the task is skipped for status-based SLA evaluation.
+- When the start event has occurred but the stop event has not (or the most
+  recent stop precedes the most recent start), the SLA is considered active.
+  Elapsed time is computed as `now - start`.
+  - If elapsed > target: `sla.status` is `breached`
+  - Else if `warn_at` is set and elapsed > warn_at: `sla.status` is `at_risk`
+  - Otherwise: `sla.status` is `ok`
 - Default SLA rule application is apply all matching rules.
 - Status values may be custom task statuses; they map to base categories via
   status mapping.
@@ -462,7 +474,7 @@ These fields are available for queries:
   - `task.due` (RFC3339)
   - `task.date` (RFC3339)
   - `task.updated_at` (RFC3339)
-  - `task.estimate` (duration)
+  - `task.estimate` (duration; see **Duration Format**)
   - `task.path` (canonical path relative to `tasks/`, no file extension)
   - `task.summary`
   - `task.type` (identifier; see **Identifier Syntax**)
@@ -478,9 +490,9 @@ These fields are available for queries:
 - SLA fields (reporting only):
   - `sla.id` (SLA rule id)
   - `sla.status` (enum: `ok`, `at_risk`, `breached`)
-  - `sla.target` (duration)
-  - `sla.elapsed` (duration)
-  - `sla.remaining` (duration)
+  - `sla.target` (duration; see **Duration Format**)
+  - `sla.elapsed` (duration; see **Duration Format**)
+  - `sla.remaining` (duration; see **Duration Format**)
 
 ### 12.1.4.1 Field Type Reference
 - `task.status`: enum (custom status value)
@@ -489,7 +501,7 @@ These fields are available for queries:
 - `task.due`: datetime (RFC3339)
 - `task.date`: datetime (RFC3339)
 - `task.updated_at`: datetime (RFC3339)
-- `task.estimate`: duration
+- `task.estimate`: duration (see **Duration Format**)
 - `task.path`: string (canonical path relative to `tasks/`)
 - `task.summary`: string
 - `task.type`: identifier
@@ -503,9 +515,9 @@ These fields are available for queries:
 - `iteration.path`: string (canonical path relative to `tasks/`)
 - `sla.id`: string
 - `sla.status`: enum (`ok`, `at_risk`, `breached`)
-- `sla.target`: duration
-- `sla.elapsed`: duration
-- `sla.remaining`: duration
+- `sla.target`: duration (see **Duration Format**)
+- `sla.elapsed`: duration (see **Duration Format**)
+- `sla.remaining`: duration (see **Duration Format**)
 
 ### 12.1.5 Functions
 - `exists(field)`
@@ -526,11 +538,16 @@ These fields are available for queries:
 - Strings can be quoted with double quotes, e.g. `"security"`.
 - Dates use RFC3339, e.g. `2026-04-01T17:00:00Z`.
 - Relative date strings are allowed only inside `date(...)`.
-- Durations follow estimate tokens, e.g. `12h`, `1.5d`.
-
-### 12.1.6.1 Duration Units
-- Supported units: `m` (minutes), `h` (hours), `d` (days), `w` (weeks).
+### 12.1.6.1 Duration Format
+- Duration format: `<number><unit>`, e.g., `2h`, `1.5d`, `30m`, `2w`.
+- Decimal values allowed (e.g., `1.5h`, `0.5d`).
+- Supported units:
+  - `m`: months
+  - `w`: weeks
+  - `d`: days
+  - `h`: hours
 - Durations may be positive or negative (negative values indicate past offsets).
+- No spaces allowed between number and unit.
 
 ### 12.1.7 Examples
 - All security tasks with a 30-day SLA:
