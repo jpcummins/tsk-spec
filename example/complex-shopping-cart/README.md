@@ -16,7 +16,7 @@ dependencies, iterations, and SLA-tracked support/incident work.
 
 ## Notes
 - Tasks are referenced by canonical paths relative to `tasks/`.
-- Backend tasks use custom task statuses (see `tasks/shopping-cart/backend/.config.toml`).
+- Backend tasks use custom task statuses (see `tasks/shopping-cart/backend/config.toml`).
 - Frontend iterations use custom iteration statuses (see `teams/frontend/team.toml`).
 - Support and incident tickets live outside the core project and are tracked with SLAs.
 

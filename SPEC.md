@@ -1,6 +1,6 @@
 # tsk spec
 
-Version: 2.0.0
+Version: 1.0.0
 
 ## Versioning
 - The spec follows semantic versioning.
@@ -20,7 +20,7 @@ It is implementation-agnostic and focused on structure, fields, and semantics.
 - Canonical task paths are rooted at the `tasks/` directory.
 - Stub files redirect moved tasks to their new paths.
 - Top-level layout:
-  - `.config.toml` is optional (root configuration; may include `version`).
+  - `config.toml` is optional (root configuration; may include `version`).
   - `tasks/` is required and is the root for canonical task paths.
   - `teams/` is optional.
   - `sla.toml` is optional.
@@ -261,14 +261,14 @@ Goals and notes.
 
 ## 10. Configuration and Inheritance
 - Configuration file format: TOML.
-- Project configuration files are named `.config.toml`.
+- Project configuration files are named `config.toml`.
 - Team configuration files are named `team.toml` and live under `teams/<team>/`.
 - Project configuration files live in project directories and apply to that
   directory subtree.
-- A global configuration may exist at the repository root (`.config.toml`).
+- A global configuration may exist at the repository root (`config.toml`).
 
 ### Repository Version
-- The root `.config.toml` may include a `version` field specifying the
+- The root `config.toml` may include a `version` field specifying the
   spec version the repository conforms to (semver string, e.g., `"0.12.0"`).
 - `version` is only valid at the repository root; it is ignored in
   subdirectory configs.
@@ -289,6 +289,9 @@ Goals and notes.
 - Defaults apply to all tasks in the current project directory and recursively.
 - Task front matter overrides inherited values.
 - Inheritance is opt-in by field (only fields listed in config are inherited).
+  For example, if `[defaults]` defines `assignee` and `priority`, but only
+  `assignee = true` is set in `[inherit]`, then `assignee` is inherited by
+  subtasks but `priority` is not.
 - Status enums are configured here and must map to base categories.
 - Iteration status enums are configured separately and must map to base categories.
 

@@ -12,7 +12,7 @@ The core idea is simple:
 A simple tsk repository looks like this:
 ```
 /
-  .config.toml
+  config.toml
   tasks/
     project-a/
       README.md
