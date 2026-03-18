@@ -1,0 +1,61 @@
+# Tests for Section 4: Configuration
+
+[[test]]
+spec_ref = "4"
+title = "Parse config with version"
+operation = "parse_config"
+
+[test.inputs]
+path = "config.toml"
+content = """version = "1.1.0"
+"""
+
+[test.expect]
+version = "1.1.0"
+
+[[test]]
+spec_ref = "4"
+title = "Parse config with status map"
+operation = "parse_config"
+
+[test.inputs]
+path = "config.toml"
+content = """[status.map]
+todo = { category = "todo", order = 10 }
+up_next = { category = "todo", order = 20 }
+in_progress = { category = "in_progress", order = 30 }
+done = { category = "done", order = 50 }
+"""
+
+[test.expect]
+status_map = { todo = { category = "todo", order = 10 }, up_next = { category = "todo", order = 20 }, in_progress = { category = "in_progress", order = 30 }, done = { category = "done", order = 50 } }
+
+[[test]]
+spec_ref = "4"
+title = "Version in subdirectory config is ignored"
+operation = "parse_config"
+
+[test.inputs]
+path = "tasks/project/config.toml"
+content = """version = "1.2.0"
+[status.map]
+todo = { category = "todo" }
+"""
+
+[test.expect]
+version_ignored = true
+status_map = { todo = { category = "todo" } }
+
+[[test]]
+spec_ref = "4"
+title = "Base category without explicit order defaults to 0"
+operation = "parse_config"
+
+[test.inputs]
+path = "config.toml"
+content = """[status.map]
+custom = { category = "todo" }
+"""
+
+[test.expect]
+status_map = { custom = { category = "todo", order = 0 } }

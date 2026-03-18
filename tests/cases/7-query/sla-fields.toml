@@ -1,0 +1,53 @@
+# Tests for Section 7.5: SLA Fields
+
+[[test]]
+spec_ref = "7.5"
+title = "SLA fields outside reporting context is invalid"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = """---
+status: todo
+---
+"""
+
+[test.inputs]
+query = 'sla.status = "breached"'
+namespace = "search"
+
+[test.expect]
+matches = []
+
+[[test.errors]]
+code = "QUERY_UNQUALIFIED_SLA"
+message_contains = "reporting"
+
+[[test]]
+spec_ref = "7.5"
+title = "SLA fields in reporting context"
+operation = "run_query"
+
+[test.files]
+"tasks/security-fix.md" = """---
+status: done
+summary: Fixed security issue
+created_at: 2026-01-01T00:00:00Z
+---
+"""
+"sla.toml" = """[[rule]]
+id = "security-30d"
+name = "Security fixes in 30 days"
+query = 'summary ~ "security"'
+target = "30d"
+start = "status:todo"
+stop = "status:done"
+severity = "high"
+"""
+
+[test.inputs]
+query = 'sla.status = "breached"'
+namespace = "reporting"
+sla_results = [{ task_path = "security-fix", id = "security-30d", status = "breached", target = "30d", elapsed = "31d", remaining = "-1d" }]
+
+[test.expect]
+matches = ["security-fix"]

@@ -1,0 +1,59 @@
+# Tests for Section 6.0: SLA Rule Storage
+
+[[test]]
+spec_ref = "6.0"
+title = "SLA rules are loaded from root sla.toml"
+operation = "evaluate_sla"
+
+[test.files]
+"tasks/t1.md" = """---
+status: done
+summary: ops issue
+updated_at: 2026-03-10T00:00:00Z
+---
+"""
+"sla.toml" = """[[rule]]
+id = "ops-respond"
+name = "Ops triage in 4h"
+query = 'summary ~ "ops"'
+target = "4h"
+start = "status:todo"
+stop = "status:done"
+severity = "high"
+"""
+
+[test.inputs]
+task_path = "t1"
+time = "2026-03-10T12:00:00Z"
+
+[test.expect]
+applied_rule_ids = ["ops-respond"]
+
+[[test]]
+spec_ref = "6.0"
+title = "Non-root sla.toml is ignored"
+operation = "evaluate_sla"
+
+[test.files]
+"tasks/t1.md" = """---
+status: done
+summary: ops issue
+updated_at: 2026-03-10T00:00:00Z
+---
+"""
+"teams/backend/sla.toml" = """[[rule]]
+id = "team-local"
+name = "Team-local rule"
+query = 'summary ~ "ops"'
+target = "1h"
+start = "status:todo"
+stop = "status:done"
+severity = "high"
+"""
+
+[test.inputs]
+task_path = "t1"
+time = "2026-03-10T12:00:00Z"
+
+[test.expect]
+applied_rule_ids = []

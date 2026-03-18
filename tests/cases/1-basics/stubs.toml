@@ -1,0 +1,66 @@
+# Tests for Section 1.2.5: Redirect Stub Files
+
+[[test]]
+spec_ref = "1.2.5"
+title = "Redirect stub resolves to target"
+operation = "resolve_stub"
+
+[test.files]
+"tasks/old/path.md" = """---
+redirect_to: new/path
+---
+"""
+
+[test.inputs]
+path = "old/path"
+
+[test.expect]
+target = "new/path"
+
+[[test]]
+spec_ref = "1.2.5"
+title = "Redirect chain too deep"
+operation = "resolve_stub"
+
+[test.files]
+"tasks/a.md" = """---
+redirect_to: b
+---
+"""
+"tasks/b.md" = """---
+redirect_to: c
+---
+"""
+"tasks/c.md" = """---
+redirect_to: d
+---
+"""
+"tasks/d.md" = """---
+redirect_to: e
+---
+"""
+
+[test.inputs]
+path = "a"
+
+[[test.errors]]
+code = "REDIRECT_CHAIN_TOO_DEEP"
+message_contains = "chain"
+
+[[test]]
+spec_ref = "1.2.5"
+title = "Invalid redirect target"
+operation = "resolve_stub"
+
+[test.files]
+"tasks/task.md" = """---
+redirect_to: invalid/path/with.md
+---
+"""
+
+[test.inputs]
+path = "task"
+
+[[test.errors]]
+code = "REDIRECT_INVALID_TARGET"
+message_contains = "canonical"

@@ -1,0 +1,62 @@
+# Tests for Section 7.4.1: Operator Type Rules
+
+[[test]]
+spec_ref = "7.4.1"
+title = "Ordering on status (enum) is invalid"
+operation = "run_query"
+
+[test.files]
+"tasks/todo.md" = """---
+status: todo
+---
+"""
+
+[test.inputs]
+query = 'status > "todo"'
+
+[test.expect]
+matches = []
+
+[[test.errors]]
+code = "QUERY_INVALID_OPERATOR"
+message_contains = "ordering"
+
+[[test]]
+spec_ref = "7.4.1"
+title = "Missing field returns false (no error)"
+operation = "run_query"
+
+[test.files]
+"tasks/no-date.md" = """---
+summary: Task without date
+---
+"""
+
+[test.inputs]
+query = 'created_at > date("today")'
+
+[test.expect]
+matches = []
+
+# No errors expected - missing field is a no-op
+
+[[test]]
+spec_ref = "7.4.1"
+title = "Status category supports inequality operator"
+operation = "run_query"
+
+[test.files]
+"tasks/todo.md" = """---
+status: todo
+---
+"""
+"tasks/done.md" = """---
+status: done
+---
+"""
+
+[test.inputs]
+query = 'status.category != "done"'
+
+[test.expect]
+matches = ["todo"]

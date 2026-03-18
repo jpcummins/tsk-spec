@@ -1,0 +1,165 @@
+# Additional DSL coverage for Sections 7.5 and 7.7
+
+[[test]]
+spec_ref = "7.5"
+title = "Unknown field emits warning"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = """---
+status: todo
+---
+"""
+
+[test.inputs]
+query = 'task.not_a_field = "x"'
+
+[test.expect]
+matches = []
+
+[[test.warnings]]
+code = "QUERY_UNKNOWN_FIELD"
+message_contains = "not_a_field"
+
+[[test]]
+spec_ref = "7.5"
+title = "Unqualified field defaults to task namespace"
+operation = "run_query"
+
+[test.files]
+"tasks/alpha.md" = """---
+summary: alpha value
+---
+"""
+"tasks/beta.md" = """---
+summary: beta value
+---
+"""
+
+[test.inputs]
+query = 'summary ~ "alpha"'
+
+[test.expect]
+matches = ["alpha"]
+
+[[test]]
+spec_ref = "7.5"
+title = "task.path field matches canonical path"
+operation = "run_query"
+
+[test.files]
+"tasks/platform/auth/login.md" = """---
+summary: login
+---
+"""
+
+[test.inputs]
+query = 'task.path ~ "platform/auth"'
+
+[test.expect]
+matches = ["platform/auth/login"]
+
+[[test]]
+spec_ref = "7.5"
+title = "task.due supports date ordering"
+operation = "run_query"
+
+[test.files]
+"tasks/soon.md" = """---
+due: 2026-03-20T00:00:00Z
+---
+"""
+"tasks/later.md" = """---
+due: 2026-04-01T00:00:00Z
+---
+"""
+
+[test.inputs]
+query = 'task.due <= "2026-03-25T00:00:00Z"'
+
+[test.expect]
+matches = ["soon"]
+
+[[test]]
+spec_ref = "7.5"
+title = "task.updated_at supports date ordering"
+operation = "run_query"
+
+[test.files]
+"tasks/old.md" = """---
+updated_at: 2026-03-01T00:00:00Z
+---
+"""
+"tasks/new.md" = """---
+updated_at: 2026-03-10T00:00:00Z
+---
+"""
+
+[test.inputs]
+query = 'task.updated_at > "2026-03-05T00:00:00Z"'
+
+[test.expect]
+matches = ["new"]
+
+[[test]]
+spec_ref = "7.7"
+title = "Relative date only allowed in date()"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = """---
+created_at: 2026-03-10T00:00:00Z
+---
+"""
+
+[test.inputs]
+query = 'created_at > "-7d"'
+
+[test.expect]
+matches = []
+
+[[test.errors]]
+code = "QUERY_INVALID_VALUE"
+message_contains = "date()"
+
+[[test]]
+spec_ref = "7.7"
+title = "date() accepts relative date string"
+operation = "run_query"
+
+[test.files]
+"tasks/recent.md" = """---
+created_at: 2026-03-12T00:00:00Z
+---
+"""
+"tasks/older.md" = """---
+created_at: 2026-02-01T00:00:00Z
+---
+"""
+
+[test.inputs]
+query = 'created_at >= date("-7d")'
+
+[test.expect]
+matches = ["recent"]
+
+[[test]]
+spec_ref = "7.5"
+title = "Labels are queried via has()"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = """---
+labels: ["mvp", "capitalizable"]
+---
+"""
+"tasks/t2.md" = """---
+labels: ["maintenance"]
+---
+"""
+
+[test.inputs]
+query = 'has(labels, "capitalizable")'
+
+[test.expect]
+matches = ["t1"]

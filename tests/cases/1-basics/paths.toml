@@ -1,0 +1,79 @@
+# Tests for Section 1.2: Identity and Addressing
+
+[[test]]
+spec_ref = "1.2.1"
+title = "Normalize path with spaces"
+operation = "normalize_path"
+
+[test.inputs]
+path = "Launch/Phase 1/Implement CLI.md"
+
+[test.expect]
+canonical_path = "launch/phase-1/implement-cli"
+
+[[test]]
+spec_ref = "1.2.1"
+title = "Normalize path removes special characters"
+operation = "normalize_path"
+
+[test.inputs]
+path = "tasks/launch/test@file.md"
+
+[test.expect]
+canonical_path = "launch/test-file"
+
+[[test]]
+spec_ref = "1.2.3"
+title = "README resolves to directory name"
+operation = "normalize_path"
+
+[test.inputs]
+path = "tasks/launch/README.md"
+
+[test.expect]
+canonical_path = "launch"
+
+[[test]]
+spec_ref = "1.2.3"
+title = "README uppercase still resolves"
+operation = "normalize_path"
+
+[test.inputs]
+path = "tasks/launch/README.md"
+
+[test.expect]
+canonical_path = "launch"
+
+[[test]]
+spec_ref = "1.2.2"
+title = "Path with uppercase triggers warning"
+operation = "normalize_path"
+
+[test.inputs]
+path = "tasks/Launch/setup.md"
+
+[test.expect]
+canonical_path = "launch/setup"
+
+[[test.warnings]]
+code = "PATH_UPPERCASE"
+message_contains = "uppercase"
+
+[[test]]
+spec_ref = "1.2.2"
+title = "Case conflict triggers warning"
+operation = "normalize_path"
+
+[test.files]
+"tasks/launch/setup.md" = "---"
+"tasks/Launch/setup.md" = "---"
+
+[test.inputs]
+path = "tasks/launch/setup.md"
+
+[test.expect]
+canonical_path = "launch/setup"
+
+[[test.warnings]]
+code = "PATH_CASE_CONFLICT"
+message_contains = "case"

@@ -1,0 +1,115 @@
+# tsk Conformance Test Schema
+# Version: 1.0.0
+
+# A test case consists of a single [[test]] block
+# Multiple tests may be defined in a single file
+
+# Required fields for each test
+required_fields = ["spec_ref", "title", "operation"]
+
+# Valid operation types
+valid_operations = [
+    "normalize_path",
+    "resolve_stub",
+    "resolve_task",
+    "resolve_hierarchy",
+    "validate_identifier",
+    "run_query",
+    "order_tasks",
+    "evaluate_sla",
+    "derive_iteration_status",
+    "parse_config",
+    "resolve_assignee",
+    "generate_report"
+]
+
+# Test structure
+# [[test]]
+# spec_ref = "1.2.1"           # Section number from SPEC.md
+# title = "..."                 # Human-readable test title
+# operation = "..."             # One of valid_operations
+#
+# [test.files]                  # Map of file paths to contents
+# "tasks/foo.md" = "..."
+#
+# [test.inputs]                 # Operation-specific inputs
+# query = "..."
+#
+# [test.expect]                # Expected outputs
+# canonical_path = "..."
+# matches = [...]
+# status = "..."
+#
+# [[test.warnings]]            # Optional expected warnings (semantic)
+# code = "PATH_UPPERCASE"
+# message_contains = "uppercase"
+#
+# [[test.errors]]               # Optional expected errors (semantic)
+# code = "QUERY_INVALID_SYNTAX"
+# message_contains = "parse"
+
+# Field type definitions
+[fields.test]
+type = "table"
+required = true
+
+[fields.test.spec_ref]
+type = "string"
+description = "Section number from SPEC.md (e.g., '1.2.1')"
+
+[fields.test.title]
+type = "string"
+description = "Human-readable test title"
+
+[fields.test.operation]
+type = "string"
+description = "Operation to test"
+valid = ["normalize_path", "resolve_stub", "resolve_task", "resolve_hierarchy", "validate_identifier", "run_query", "order_tasks", "evaluate_sla", "derive_iteration_status", "parse_config", "resolve_assignee", "generate_report"]
+
+[fields.test.files]
+type = "table"
+description = "Map of file paths to their contents"
+
+[fields.test.inputs]
+type = "table"
+description = "Operation-specific input parameters"
+
+[fields.test.expect]
+type = "table"
+description = "Expected outputs from the operation"
+
+[fields.test.warnings]
+type = "array_of_tables"
+description = "Expected warnings (semantic matching)"
+required_fields = ["code"]
+
+[fields.test.warnings.fields.code]
+type = "string"
+description = "Warning code from SPEC.md Section 10"
+
+[fields.test.warnings.fields.level]
+type = "string"
+description = "Must be 'warn'"
+default = "warn"
+
+[fields.test.warnings.fields.message_contains]
+type = "string"
+description = "Optional substring to match in warning message"
+
+[fields.test.errors]
+type = "array_of_tables"
+description = "Expected errors (semantic matching)"
+required_fields = ["code"]
+
+[fields.test.errors.fields.code]
+type = "string"
+description = "Error code from SPEC.md Section 10"
+
+[fields.test.errors.fields.level]
+type = "string"
+description = "Must be 'error'"
+default = "error"
+
+[fields.test.errors.fields.message_contains]
+type = "string"
+description = "Optional substring to match in error message"

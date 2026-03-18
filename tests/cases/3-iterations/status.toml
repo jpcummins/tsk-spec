@@ -1,0 +1,66 @@
+# Tests for Section 3: Iteration Status
+
+[[test]]
+spec_ref = "3"
+title = "Iteration status is todo when now < start"
+operation = "derive_iteration_status"
+
+[test.inputs]
+start = "2026-04-01T00:00:00Z"
+end = "2026-04-07T23:59:59Z"
+now = "2026-03-15T00:00:00Z"
+
+[test.expect]
+status = "todo"
+
+[[test]]
+spec_ref = "3"
+title = "Iteration status is in_progress when start <= now <= end"
+operation = "derive_iteration_status"
+
+[test.inputs]
+start = "2026-04-01T00:00:00Z"
+end = "2026-04-07T23:59:59Z"
+now = "2026-04-03T12:00:00Z"
+
+[test.expect]
+status = "in_progress"
+
+[[test]]
+spec_ref = "3"
+title = "Iteration status is done when now > end"
+operation = "derive_iteration_status"
+
+[test.inputs]
+start = "2026-04-01T00:00:00Z"
+end = "2026-04-07T23:59:59Z"
+now = "2026-04-10T00:00:00Z"
+
+[test.expect]
+status = "done"
+
+[[test]]
+spec_ref = "3"
+title = "Iteration status is in_progress at exactly start time"
+operation = "derive_iteration_status"
+
+[test.inputs]
+start = "2026-04-01T00:00:00Z"
+end = "2026-04-07T23:59:59Z"
+now = "2026-04-01T00:00:00Z"
+
+[test.expect]
+status = "in_progress"
+
+[[test]]
+spec_ref = "3"
+title = "Iteration status is in_progress at exactly end time"
+operation = "derive_iteration_status"
+
+[test.inputs]
+start = "2026-04-01T00:00:00Z"
+end = "2026-04-07T23:59:59Z"
+now = "2026-04-07T23:59:59Z"
+
+[test.expect]
+status = "in_progress"

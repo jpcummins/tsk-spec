@@ -1,0 +1,136 @@
+# Tests for Section 7.6: Functions
+
+[[test]]
+spec_ref = "7.6.1"
+title = "exists() predicate function"
+operation = "run_query"
+
+[test.files]
+"tasks/with-date.md" = """---
+created_at: 2026-01-01T00:00:00Z
+---
+"""
+"tasks/no-date.md" = "---"
+
+[test.inputs]
+query = 'exists(created_at)'
+
+[test.expect]
+matches = ["with-date"]
+
+[[test]]
+spec_ref = "7.6.1"
+title = "missing() predicate function"
+operation = "run_query"
+
+[test.files]
+"tasks/with-date.md" = """---
+created_at: 2026-01-01T00:00:00Z
+---
+"""
+"tasks/no-date.md" = "---"
+
+[test.inputs]
+query = 'missing(created_at)'
+
+[test.expect]
+matches = ["no-date"]
+
+[[test]]
+spec_ref = "7.6.1"
+title = "has() for list membership (labels)"
+operation = "run_query"
+
+[test.files]
+"tasks/labeled.md" = """---
+labels: ["bug", "critical"]
+---
+"""
+"tasks/normal.md" = "---"
+
+[test.inputs]
+query = 'has(labels, "bug")'
+
+[test.expect]
+matches = ["labeled"]
+
+[[test]]
+spec_ref = "7.6.1"
+title = "has() for list membership (dependencies)"
+operation = "run_query"
+
+[test.files]
+"tasks/dep-task.md" = "---"
+"tasks/main-task.md" = """---
+dependencies: ["dep-task"]
+---
+"""
+
+[test.inputs]
+query = 'has(dependencies, "dep-task")'
+
+[test.expect]
+matches = ["main-task"]
+
+[[test]]
+spec_ref = "7.6.2"
+title = "date() function with relative value"
+operation = "run_query"
+
+[test.files]
+"tasks/recent.md" = """---
+created_at: 2026-03-10T00:00:00Z
+---
+"""
+"tasks/old.md" = """---
+created_at: 2026-01-01T00:00:00Z
+---
+"""
+
+[test.inputs]
+query = 'created_at >= date("-7d")'
+
+[test.expect]
+matches = ["recent"]
+
+[[test]]
+spec_ref = "7.6.2"
+title = "team() function expands to members"
+operation = "run_query"
+
+[test.files]
+"tasks/alice-task.md" = """---
+assignee: "alice"
+---
+"""
+"tasks/bob-task.md" = """---
+assignee: "bob"
+---
+"""
+"teams/backend/team.toml" = """[members]
+alice = "Alice <alice@example.com>"
+bob = "Bob <bob@example.com>"
+"""
+
+[test.inputs]
+query = 'assignee = team("backend")'
+
+[test.expect]
+matches = ["alice-task", "bob-task"]
+
+[[test]]
+spec_ref = "7.6.2"
+title = "team() function matches team prefix"
+operation = "run_query"
+
+[test.files]
+"tasks/team-task.md" = """---
+assignee: "team:backend"
+---
+"""
+
+[test.inputs]
+query = 'assignee = team("backend")'
+
+[test.expect]
+matches = ["team-task"]

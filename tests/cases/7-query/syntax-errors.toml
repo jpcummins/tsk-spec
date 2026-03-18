@@ -1,0 +1,73 @@
+# Tests for Query Syntax Errors
+
+[[test]]
+spec_ref = "7.2"
+title = "Invalid query syntax - unmatched parenthesis"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = "---"
+
+[test.inputs]
+query = '(status = "todo"'
+
+[test.expect]
+matches = []
+
+[[test.errors]]
+code = "QUERY_INVALID_SYNTAX"
+message_contains = "paren"
+
+[[test]]
+spec_ref = "7.2"
+title = "Invalid query syntax - empty expression"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = "---"
+
+[test.inputs]
+query = ''
+
+[test.expect]
+matches = []
+
+[[test.errors]]
+code = "QUERY_INVALID_SYNTAX"
+message_contains = "empty"
+
+[[test]]
+spec_ref = "7.6"
+title = "Unknown function triggers error"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = "---"
+
+[test.inputs]
+query = 'unknownfunc()'
+
+[test.expect]
+matches = []
+
+[[test.errors]]
+code = "QUERY_UNKNOWN_FUNCTION"
+message_contains = "unknownfunc"
+
+[[test]]
+spec_ref = "7.7"
+title = "Invalid date value triggers error"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = "---"
+
+[test.inputs]
+query = 'created_at > date("not-a-date")'
+
+[test.expect]
+matches = []
+
+[[test.errors]]
+code = "QUERY_INVALID_VALUE"
+message_contains = "date"

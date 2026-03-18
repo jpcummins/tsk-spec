@@ -1,0 +1,119 @@
+# Tests for Section 7.3: Precedence and Associativity
+
+[[test]]
+spec_ref = "7.3"
+title = "NOT has higher precedence than AND"
+operation = "run_query"
+
+[test.files]
+"tasks/a.md" = """---
+status: todo
+labels: ["bug"]
+---
+"""
+"tasks/b.md" = """---
+status: done
+labels: ["bug"]
+---
+"""
+"tasks/c.md" = """---
+status: todo
+---
+"""
+
+[test.inputs]
+query = 'NOT has(labels, "bug") AND status = "todo"'
+
+# Should parse as: (NOT has(labels, "bug")) AND (status = "todo")
+# Matches tasks that don't have "bug" label AND have status = "todo"
+[test.expect]
+matches = ["c"]
+
+[[test]]
+spec_ref = "7.3"
+title = "AND has higher precedence than OR"
+operation = "run_query"
+
+[test.files]
+"tasks/a.md" = """---
+status: todo
+type: bug
+---
+"""
+"tasks/b.md" = """---
+status: done
+type: bug
+---
+"""
+"tasks/c.md" = """---
+status: todo
+type: feature
+---
+"""
+
+[test.inputs]
+query = 'status = "todo" AND type = "bug" OR status = "done"'
+
+# Should parse as: (status = "todo" AND type = "bug") OR (status = "done")
+# Matches: a (todo + bug), b (done)
+[test.expect]
+matches = ["a", "b"]
+
+[[test]]
+spec_ref = "7.3"
+title = "Parentheses can override precedence"
+operation = "run_query"
+
+[test.files]
+"tasks/a.md" = """---
+status: todo
+type: bug
+---
+"""
+"tasks/b.md" = """---
+status: done
+type: bug
+---
+"""
+"tasks/c.md" = """---
+status: todo
+type: feature
+---
+"""
+
+[test.inputs]
+query = 'status = "todo" AND (type = "bug" OR status = "done")'
+
+# Should parse as: status = "todo" AND (type = "bug" OR status = "done")
+# Matches: a (todo AND bug)
+[test.expect]
+matches = ["a"]
+
+[[test]]
+spec_ref = "7.3"
+title = "NOT on iteration predicate negates existence"
+operation = "run_query"
+
+[test.files]
+"tasks/in-iter.md" = """---
+status: todo
+---
+"""
+"tasks/out-iter.md" = """---
+status: todo
+---
+"""
+"teams/backend/iterations/sprint1.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks:
+  - in-iter
+---
+"""
+
+[test.inputs]
+query = 'NOT iteration.team = "backend" AND status = "todo"'
+
+# Returns todo tasks that are NOT in any backend iteration
+[test.expect]
+matches = ["out-iter"]

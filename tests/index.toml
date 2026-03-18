@@ -1,0 +1,26 @@
+# Test case index
+# This file lists all test case files in the conformance suite
+
+files = [
+  "tests/cases/1-basics/paths.toml",
+  "tests/cases/1-basics/stubs.toml",
+  "tests/cases/1-basics/model.toml",
+  "tests/cases/1-basics/identifiers.toml",
+  "tests/cases/1-basics/storage-and-task-entity.toml",
+  "tests/cases/2-teams/assignee.toml",
+  "tests/cases/3-iterations/status.toml",
+  "tests/cases/4-config/parse.toml",
+  "tests/cases/6-sla/storage.toml",
+  "tests/cases/6-sla/evaluate.toml",
+  "tests/cases/7-query/operators.toml",
+  "tests/cases/7-query/operator-errors.toml",
+  "tests/cases/7-query/cross-entity.toml",
+  "tests/cases/7-query/sla-fields.toml",
+  "tests/cases/7-query/functions.toml",
+  "tests/cases/7-query/precedence.toml",
+  "tests/cases/7-query/iteration-queries.toml",
+  "tests/cases/7-query/syntax-errors.toml",
+  "tests/cases/7-query/fields-and-values.toml",
+  "tests/cases/8-reporting/virtual-nodes.toml",
+  "tests/cases/9-search/core.toml"
+]

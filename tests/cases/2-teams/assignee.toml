@@ -1,0 +1,83 @@
+# Tests for Section 2: Teams and Assignee Resolution
+
+[[test]]
+spec_ref = "2"
+title = "Assignee resolves to person"
+operation = "resolve_assignee"
+
+[test.files]
+"teams/backend/team.toml" = """[members]
+alice = "Alice Smith <alice@example.com>"
+"""
+
+[test.inputs]
+assignee = "alice"
+
+[test.expect]
+type = "person"
+value = "Alice Smith <alice@example.com>"
+
+[[test]]
+spec_ref = "2"
+title = "Assignee resolves to team"
+operation = "resolve_assignee"
+
+[test.inputs]
+assignee = "team:backend"
+
+[test.expect]
+type = "team"
+value = "team:backend"
+
+[[test]]
+spec_ref = "2"
+title = "Assignee email resolves directly"
+operation = "resolve_assignee"
+
+[test.inputs]
+assignee = "alice@example.com"
+
+[test.expect]
+type = "person"
+value = "alice@example.com"
+
+[[test]]
+spec_ref = "2"
+title = "Unknown member triggers warning"
+operation = "resolve_assignee"
+
+[test.files]
+"teams/backend/team.toml" = """[members]
+alice = "Alice <alice@example.com>"
+"""
+
+[test.inputs]
+assignee = "unknown"
+
+[[test.warnings]]
+code = "ASSIGNEE_UNKNOWN_MEMBER"
+message_contains = "unknown"
+
+[[test]]
+spec_ref = "2"
+title = "Member in multiple teams triggers conflict warning"
+operation = "resolve_assignee"
+
+[test.files]
+"teams/aaa/team.toml" = """[members]
+bob = "Bob Alpha <bob@example.com>"
+"""
+"teams/zzz/team.toml" = """[members]
+bob = "Bob Zebra <bob@example.com>"
+"""
+
+[test.inputs]
+assignee = "bob"
+
+[test.expect]
+type = "person"
+value = "Bob Alpha <bob@example.com>"
+
+[[test.warnings]]
+code = "ASSIGNEE_MEMBER_CONFLICT"
+message_contains = "bob"

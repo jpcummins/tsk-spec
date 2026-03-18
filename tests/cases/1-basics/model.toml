@@ -1,0 +1,87 @@
+# Tests for Sections 1.3, 1.4, 1.6, and 1.7
+
+[[test]]
+spec_ref = "1.3"
+title = "Default ordering is lexicographic by filename"
+operation = "order_tasks"
+
+[test.inputs]
+paths = ["tasks/p/b.md", "tasks/p/a.md", "tasks/p/c.md"]
+
+[test.expect]
+ordered_paths = ["tasks/p/a.md", "tasks/p/b.md", "tasks/p/c.md"]
+
+[[test]]
+spec_ref = "1.3"
+title = "Weight overrides filename ordering"
+operation = "order_tasks"
+
+[test.inputs]
+paths = ["tasks/p/b.md", "tasks/p/a.md", "tasks/p/c.md"]
+weights = { "tasks/p/b.md" = 1, "tasks/p/a.md" = 10 }
+
+[test.expect]
+ordered_paths = ["tasks/p/b.md", "tasks/p/a.md", "tasks/p/c.md"]
+
+[[test]]
+spec_ref = "1.4"
+title = "Status is optional and missing status is excluded from status query"
+operation = "run_query"
+
+[test.files]
+"tasks/with-status.md" = """---
+status: todo
+---
+"""
+"tasks/no-status.md" = """---
+summary: missing status
+---
+"""
+
+[test.inputs]
+query = 'status.category = "todo"'
+
+[test.expect]
+matches = ["with-status"]
+
+[[test]]
+spec_ref = "1.6"
+title = "Directory container takes precedence over same-path task file"
+operation = "resolve_hierarchy"
+
+[test.files]
+"tasks/launch.md" = """---
+summary: leaf task
+---
+"""
+"tasks/launch/README.md" = """---
+summary: container task
+---
+"""
+
+[test.inputs]
+path = "launch"
+
+[test.expect]
+resolved_kind = "directory"
+resolved_path = "launch"
+
+[[test]]
+spec_ref = "1.7"
+title = "Project README uses same task schema"
+operation = "resolve_task"
+
+[test.files]
+"tasks/platform/README.md" = """---
+summary: Platform project
+status: in_progress
+labels: ["epic"]
+---
+"""
+
+[test.inputs]
+path = "platform"
+
+[test.expect]
+canonical_path = "platform"
+task_fields = ["summary", "status", "labels"]

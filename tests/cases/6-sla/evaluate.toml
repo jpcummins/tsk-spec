@@ -1,0 +1,140 @@
+# Tests for Section 6: SLA Evaluation
+
+[[test]]
+spec_ref = "6.0.1"
+title = "SLA breached when elapsed exceeds target"
+operation = "evaluate_sla"
+
+[test.files]
+"tasks/security-fix.md" = """---
+status: done
+summary: Fixed security issue
+created_at: 2026-01-01T00:00:00Z
+updated_at: 2026-01-15T00:00:00Z
+change_log:
+  - field: status
+    from: todo
+    to: done
+    at: 2026-01-15T00:00:00Z
+---
+"""
+"sla.toml" = """[[rule]]
+id = "security-30d"
+name = "Security fixes in 30 days"
+query = 'summary ~ "security"'
+target = "30d"
+start = "status:todo"
+stop = "status:done"
+severity = "high"
+"""
+
+[test.inputs]
+task_path = "security-fix"
+time = "2026-02-01T00:00:00Z"
+
+[test.expect]
+status = "breached"
+elapsed = "31d"
+
+[[test]]
+spec_ref = "6.0.1"
+title = "SLA at risk when elapsed exceeds warn_at"
+operation = "evaluate_sla"
+
+[test.files]
+"tasks/security-fix.md" = """---
+status: done
+summary: Fixed security issue
+created_at: 2026-01-01T00:00:00Z
+updated_at: 2026-01-10T00:00:00Z
+change_log:
+  - field: status
+    from: todo
+    to: done
+    at: 2026-01-10T00:00:00Z
+---
+"""
+"sla.toml" = """[[rule]]
+id = "security-30d"
+name = "Security fixes in 30 days"
+query = 'summary ~ "security"'
+target = "30d"
+warn_at = "10d"
+start = "status:todo"
+stop = "status:done"
+severity = "high"
+"""
+
+[test.inputs]
+task_path = "security-fix"
+time = "2026-01-12T00:00:00Z"
+
+[test.expect]
+status = "at_risk"
+elapsed = "11d"
+
+[[test]]
+spec_ref = "6.0.1"
+title = "SLA OK when elapsed below warn_at"
+operation = "evaluate_sla"
+
+[test.files]
+"tasks/security-fix.md" = """---
+status: done
+summary: Fixed security issue
+created_at: 2026-01-01T00:00:00Z
+updated_at: 2026-01-05T00:00:00Z
+change_log:
+  - field: status
+    from: todo
+    to: done
+    at: 2026-01-05T00:00:00Z
+---
+"""
+"sla.toml" = """[[rule]]
+id = "security-30d"
+name = "Security fixes in 30 days"
+query = 'summary ~ "security"'
+target = "30d"
+warn_at = "10d"
+start = "status:todo"
+stop = "status:done"
+severity = "high"
+"""
+
+[test.inputs]
+task_path = "security-fix"
+time = "2026-01-06T00:00:00Z"
+
+[test.expect]
+status = "ok"
+elapsed = "5d"
+
+[[test]]
+spec_ref = "6.0.1"
+title = "Status-based SLA without updated_at triggers warning"
+operation = "evaluate_sla"
+
+[test.files]
+"tasks/security-fix.md" = """---
+status: done
+summary: Fixed security issue
+---
+"""
+"sla.toml" = """[[rule]]
+id = "security-30d"
+name = "Security fixes in 30 days"
+query = 'summary ~ "security"'
+target = "30d"
+start = "status:todo"
+stop = "status:done"
+severity = "high"
+"""
+
+[test.inputs]
+task_path = "security-fix"
+time = "2026-02-01T00:00:00Z"
+
+[[test.warnings]]
+code = "SLA_STATUS_MISSING_UPDATED_AT"
+message_contains = "updated_at"

@@ -1,0 +1,45 @@
+# Tests for Section 8: Reporting Expectations
+
+[[test]]
+spec_ref = "8"
+title = "Virtual nodes appear in reports"
+operation = "generate_report"
+
+[test.files]
+"tasks/initiative/subtask-a.md" = """---
+status: todo
+---
+"""
+"tasks/initiative/subtask-b.md" = """---
+status: done
+---
+"""
+
+[test.inputs]
+scope = "tasks"
+
+[test.expect]
+nodes = ["initiative", "initiative/subtask-a", "initiative/subtask-b"]
+virtual_nodes = ["initiative"]
+
+[[test]]
+spec_ref = "8"
+title = "Reporting spans tasks and teams"
+operation = "generate_report"
+
+[test.files]
+"tasks/platform/api.md" = """---
+status: in_progress
+assignee: "team:backend"
+---
+"""
+"teams/backend/team.toml" = """[members]
+alice = "Alice <alice@example.com>"
+"""
+
+[test.inputs]
+scope = "teams"
+
+[test.expect]
+teams = ["backend"]
+tasks_by_team = { backend = ["platform/api"] }

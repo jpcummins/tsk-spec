@@ -1,0 +1,110 @@
+# Tests for Section 7.5: Iteration Field Queries
+
+[[test]]
+spec_ref = "7.5"
+title = "Query with only iteration.* returns all tasks in matching iterations"
+operation = "run_query"
+
+[test.files]
+"tasks/in-backend.md" = "---"
+"tasks/in-frontend.md" = "---"
+"tasks/no-iteration.md" = "---"
+"teams/backend/iterations/sprint1.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks:
+  - in-backend
+---
+"""
+"teams/frontend/iterations/sprint1.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks:
+  - in-frontend
+---
+"""
+
+[test.inputs]
+query = 'iteration.team = "backend"'
+
+[test.expect]
+matches = ["in-backend"]
+
+[[test]]
+spec_ref = "7.5"
+title = "Query with task.* and iteration.* excludes tasks not in iteration"
+operation = "run_query"
+
+[test.files]
+"tasks/in-iter.md" = """---
+status: todo
+---
+"""
+"tasks/out-iter.md" = """---
+status: todo
+---
+"""
+"teams/backend/iterations/sprint1.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks:
+  - in-iter
+---
+"""
+
+[test.inputs]
+query = 'task.status = "todo" AND iteration.team = "backend"'
+
+[test.expect]
+matches = ["in-iter"]
+
+[[test]]
+spec_ref = "7.5"
+title = "Iteration query returns tasks in any matching iteration"
+operation = "run_query"
+
+[test.files]
+"tasks/shared.md" = "---"
+"teams/backend/iterations/sprint1.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks:
+  - shared
+---
+"""
+"teams/backend/iterations/sprint2.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks:
+  - shared
+---
+"""
+
+[test.inputs]
+query = 'iteration.team = "backend"'
+
+[test.expect]
+matches = ["shared"]
+
+[[test]]
+spec_ref = "7.5"
+title = "Task without iteration excluded when iteration.* present"
+operation = "run_query"
+
+[test.files]
+"tasks/orphan.md" = """---
+status: todo
+---
+"""
+"teams/backend/iterations/sprint1.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks: []
+---
+"""
+
+[test.inputs]
+query = 'iteration.team = "backend" AND task.status = "todo"'
+
+[test.expect]
+matches = []

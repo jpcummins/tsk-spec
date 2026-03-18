@@ -44,7 +44,7 @@ path ~ "support/" AND status.category != done
 ```
 
 tsk repositories are intended to live in their own git repo, separate
-from application code, to keep the application's git history clean. This is not required; the system is flexible enough to live alongside a codebase in the same repo. Client applications may commit and push changes transparently to the user.
+from application code, to keep the application's git history clean. This is not required; the system is flexible enough to live alongside a codebase in the same repo.
 
 ## Implementations
 

@@ -1,0 +1,45 @@
+# Tests for Section 1.2.4: Identifier Syntax
+
+[[test]]
+spec_ref = "1.2.4"
+title = "Valid identifier with hyphen"
+operation = "validate_identifier"
+
+[test.inputs]
+value = "phase-1"
+
+[test.expect]
+valid = true
+
+[[test]]
+spec_ref = "1.2.4"
+title = "Valid identifier with numbers"
+operation = "validate_identifier"
+
+[test.inputs]
+value = "v2"
+
+[test.expect]
+valid = true
+
+[[test]]
+spec_ref = "1.2.4"
+title = "Identifier cannot start with hyphen"
+operation = "validate_identifier"
+
+[test.inputs]
+value = "-invalid"
+
+[test.expect]
+valid = false
+
+[[test]]
+spec_ref = "1.2.4"
+title = "Identifier cannot contain uppercase"
+operation = "validate_identifier"
+
+[test.inputs]
+value = "TeamA"
+
+[test.expect]
+valid = false

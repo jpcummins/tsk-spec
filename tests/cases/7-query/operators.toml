@@ -1,0 +1,135 @@
+# Tests for Section 7.4: Operators
+
+[[test]]
+spec_ref = "7.4"
+title = "Equality operator matches"
+operation = "run_query"
+
+[test.files]
+"tasks/todo.md" = """---
+status: todo
+summary: First task
+---
+"""
+"tasks/done.md" = """---
+status: done
+summary: Second task
+---
+"""
+
+[test.inputs]
+query = 'status = "todo"'
+
+[test.expect]
+matches = ["todo"]
+
+[[test]]
+spec_ref = "7.4"
+title = "Inequality operator"
+operation = "run_query"
+
+[test.files]
+"tasks/todo.md" = """---
+status: todo
+summary: First task
+---
+"""
+"tasks/done.md" = """---
+status: done
+summary: Second task
+---
+"""
+
+[test.inputs]
+query = 'status != "todo"'
+
+[test.expect]
+matches = ["done"]
+
+[[test]]
+spec_ref = "7.4"
+title = "Contains operator (substring)"
+operation = "run_query"
+
+[test.files]
+"tasks/security-fix.md" = """---
+summary: Fix security vulnerability
+---
+"""
+"tasks/feature.md" = """---
+summary: Add new feature
+---
+"""
+
+[test.inputs]
+query = 'summary ~ "security"'
+
+[test.expect]
+matches = ["security-fix"]
+
+[[test]]
+spec_ref = "7.4"
+title = "IN operator for set membership"
+operation = "run_query"
+
+[test.files]
+"tasks/todo.md" = """---
+status: todo
+---
+"""
+"tasks/done.md" = """---
+status: done
+---
+"""
+"tasks/in_progress.md" = """---
+status: in_progress
+---
+"""
+
+[test.inputs]
+query = 'status IN ["todo", "in_progress"]'
+
+[test.expect]
+matches = ["todo", "in_progress"]
+
+[[test]]
+spec_ref = "7.4"
+title = "Ordering operator on date"
+operation = "run_query"
+
+[test.files]
+"tasks/old.md" = """---
+created_at: 2026-01-01T00:00:00Z
+---
+"""
+"tasks/new.md" = """---
+created_at: 2026-03-01T00:00:00Z
+---
+"""
+
+[test.inputs]
+query = 'created_at > "2026-02-01T00:00:00Z"'
+
+[test.expect]
+matches = ["new"]
+
+[[test]]
+spec_ref = "7.4"
+title = "Ordering operator on duration"
+operation = "run_query"
+
+[test.files]
+"tasks/short.md" = """---
+estimate: 2h
+---
+"""
+"tasks/long.md" = """---
+estimate: 8h
+---
+"""
+
+[test.inputs]
+query = 'estimate > "4h"'
+
+[test.expect]
+matches = ["long"]

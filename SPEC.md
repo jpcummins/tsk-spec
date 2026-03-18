@@ -616,3 +616,37 @@ operator (`<value-fn>`). They cannot be used as standalone predicates.
 - Search is a first-class capability across CLI, web UI, and API.
 - The query language (Section 7) is the baseline DSL for search across the system.
 - All major views should be expressible as saved or ad-hoc queries.
+
+## 10. Error and Warning Codes
+
+This section defines the canonical error and warning codes for the tsk system.
+Codes are a stable API and must not change once published.
+
+| Code                            | Level | Description                             | Trigger                                                |
+| ------------------------------- | ----- | --------------------------------------- | ------------------------------------------------------ |
+| `QUERY_INVALID_SYNTAX`          | error | Query fails grammar parsing             | Invalid query syntax                                   |
+| `QUERY_INVALID_OPERATOR`        | error | Operator not valid for field type       | Using `<`, `<=`, `>`, `>=` on non-comparable field     |
+| `QUERY_OR_CROSS_NAMESPACE`      | error | OR across namespaces is invalid         | OR between task._ and iteration._ or sla.\* predicates |
+| `QUERY_UNKNOWN_FIELD`           | warn  | Unknown field reference                 | Query references unknown field                         |
+| `QUERY_UNKNOWN_FUNCTION`        | error | Unknown predicate or value function     | Unrecognized function in query                         |
+| `QUERY_INVALID_VALUE`           | error | Invalid literal value                   | Malformed date, duration, or other literal             |
+| `QUERY_UNQUALIFIED_SLA`         | error | SLA fields used outside reporting       | Reference to sla.\* fields in non-reporting context    |
+| `PATH_UPPERCASE`                | warn  | Uppercase characters in on-disk path    | Path contains uppercase on case-sensitive filesystem   |
+| `PATH_CASE_CONFLICT`            | warn  | Both upper and lowercase variants exist | Upper and lowercase file coexist                       |
+| `REDIRECT_CHAIN_TOO_DEEP`       | error | Redirect chain exceeds max depth        | Redirect chain depth > 3                               |
+| `REDIRECT_INVALID_TARGET`       | error | Redirect target is not canonical        | redirect_to is not a valid canonical path              |
+| `ASSIGNEE_UNKNOWN_MEMBER`       | warn  | Member identifier not found in any team | Assignee references unknown member                     |
+| `ASSIGNEE_MEMBER_CONFLICT`      | warn  | Member found in multiple teams          | Same identifier resolves to different values           |
+| `SLA_STATUS_MISSING_UPDATED_AT` | warn  | Status-based SLA without updated_at     | SLA uses status:\* events but task lacks updated_at    |
+
+### Code References
+
+- Section 1.2.2: `PATH_UPPERCASE`, `PATH_CASE_CONFLICT`
+- Section 1.2.5: `REDIRECT_CHAIN_TOO_DEEP`, `REDIRECT_INVALID_TARGET`
+- Section 2: `ASSIGNEE_UNKNOWN_MEMBER`, `ASSIGNEE_MEMBER_CONFLICT`
+- Section 6: `SLA_STATUS_MISSING_UPDATED_AT`
+- Section 7.4.1: `QUERY_INVALID_OPERATOR`
+- Section 7.4.2: `QUERY_OR_CROSS_NAMESPACE`
+- Section 7.5: `QUERY_UNQUALIFIED_SLA`
+- Section 7.6: `QUERY_UNKNOWN_FUNCTION`
+- Section 7.7: `QUERY_INVALID_VALUE`

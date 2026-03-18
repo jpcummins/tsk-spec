@@ -1,0 +1,47 @@
+# Tests for Section 9: Search as a Core Primitive
+
+[[test]]
+spec_ref = "9"
+title = "Search query returns expected tasks"
+operation = "run_query"
+
+[test.files]
+"tasks/launch/setup.md" = """---
+status: in_progress
+summary: Setup CI pipeline
+---
+"""
+"tasks/launch/release.md" = """---
+status: done
+summary: Release v1
+---
+"""
+
+[test.inputs]
+query = 'path ~ "launch/" AND status.category != "done"'
+
+[test.expect]
+matches = ["launch/setup"]
+
+[[test]]
+spec_ref = "9"
+title = "Saved view query is equivalent to ad-hoc query"
+operation = "run_query"
+
+[test.files]
+"tasks/ops/monitoring.md" = """---
+status: todo
+assignee: "team:ops"
+---
+"""
+"tasks/ops/alerts.md" = """---
+status: in_progress
+assignee: "team:ops"
+---
+"""
+
+[test.inputs]
+query = 'assignee = "team:ops" AND status.category != "done"'
+
+[test.expect]
+matches = ["ops/monitoring", "ops/alerts"]

@@ -1,0 +1,155 @@
+# Tests for Section 7.4.2: Cross-Entity Query Rules
+
+[[test]]
+spec_ref = "7.4.2"
+title = "OR across namespaces is invalid"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = """---
+status: todo
+---
+"""
+
+[test.inputs]
+query = 'task.status = "todo" OR iteration.team = "backend"'
+
+[test.expect]
+matches = []
+
+[[test.errors]]
+code = "QUERY_OR_CROSS_NAMESPACE"
+message_contains = "namespace"
+
+[[test]]
+spec_ref = "7.4.2"
+title = "AND across namespaces is valid"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = """---
+status: todo
+---
+"""
+"teams/backend/team.toml" = """[members]
+alice = "Alice <alice@example.com>"
+"""
+"teams/backend/iterations/sprint1.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks:
+  - t1
+---
+"""
+
+[test.inputs]
+query = 'task.status = "todo" AND iteration.team = "backend"'
+
+[test.expect]
+matches = ["t1"]
+
+[[test]]
+spec_ref = "7.4.2"
+title = "NOT iteration.* means no matching iteration exists"
+operation = "run_query"
+
+[test.files]
+"tasks/with-iter.md" = """---
+status: todo
+---
+"""
+"tasks/no-iter.md" = """---
+status: todo
+---
+"""
+"teams/backend/iterations/sprint1.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks:
+  - with-iter
+---
+"""
+
+[test.inputs]
+query = 'NOT iteration.team = "backend" AND status = "todo"'
+
+[test.expect]
+matches = ["no-iter"]
+
+[[test]]
+spec_ref = "7.4.2"
+title = "NOT sla.* means no SLA measurement breached"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = """---
+status: done
+summary: Security fix
+---
+"""
+"sla.toml" = """[[rule]]
+id = "security-30d"
+name = "Security fixes in 30 days"
+query = 'summary ~ "security"'
+target = "30d"
+start = "status:todo"
+stop = "status:done"
+severity = "high"
+"""
+
+[test.inputs]
+query = 'NOT sla.status = "breached" AND status = "done"'
+namespace = "reporting"
+sla_results = [{ task_path = "t1", id = "security-30d", status = "ok", target = "30d", elapsed = "5d", remaining = "25d" }]
+
+[test.expect]
+matches = ["t1"]
+
+[[test]]
+spec_ref = "7.4.2"
+title = "OR within same namespace is valid (task.*)"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = """---
+status: todo
+---
+"""
+"tasks/t2.md" = """---
+status: done
+---
+"""
+
+[test.inputs]
+query = 'status = "todo" OR status = "done"'
+
+[test.expect]
+matches = ["t1", "t2"]
+
+[[test]]
+spec_ref = "7.4.2"
+title = "OR within same namespace is valid (iteration.*)"
+operation = "run_query"
+
+[test.files]
+"tasks/t1.md" = "---"
+"teams/backend/iterations/sprint1.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks:
+  - t1
+---
+"""
+"teams/frontend/iterations/sprint1.md" = """---
+start: 2026-01-01T00:00:00Z
+end: 2026-12-31T23:59:59Z
+tasks:
+  - t1
+---
+"""
+
+[test.inputs]
+query = 'iteration.team = "backend" OR iteration.team = "frontend"'
+
+[test.expect]
+matches = ["t1"]

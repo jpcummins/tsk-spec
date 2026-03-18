@@ -1,0 +1,89 @@
+# Tests for Sections 1.1 and 1.5
+
+[[test]]
+spec_ref = "1.1"
+title = "Task records are Markdown files with YAML front matter"
+operation = "resolve_task"
+
+[test.files]
+"tasks/launch/setup.md" = """---
+summary: Setup CI
+status: todo
+---
+Body content
+"""
+
+[test.inputs]
+path = "launch/setup"
+
+[test.expect]
+canonical_path = "launch/setup"
+front_matter_format = "yaml"
+
+[[test]]
+spec_ref = "1.1"
+title = "README in directory resolves as parent task"
+operation = "resolve_task"
+
+[test.files]
+"tasks/launch/README.md" = """---
+summary: Launch project
+---
+"""
+
+[test.inputs]
+path = "launch"
+
+[test.expect]
+canonical_path = "launch"
+
+[[test]]
+spec_ref = "1.5"
+title = "Task entity supports minimal optional fields"
+operation = "resolve_task"
+
+[test.files]
+"tasks/minimal.md" = """---
+summary: Minimal task
+---
+"""
+
+[test.inputs]
+path = "minimal"
+
+[test.expect]
+canonical_path = "minimal"
+fields_present = ["summary"]
+
+[[test]]
+spec_ref = "1.5"
+title = "Task entity supports all documented optional fields"
+operation = "resolve_task"
+
+[test.files]
+"tasks/full.md" = """---
+created_at: 2026-03-01T00:00:00Z
+due: 2026-03-10T00:00:00Z
+assignee: "team:backend"
+dependencies: ["launch/setup"]
+summary: Full task
+estimate: "4h"
+status: "todo"
+updated_at: 2026-03-02T00:00:00Z
+change_log:
+  - field: status
+    from: todo
+    to: in_progress
+    at: 2026-03-03T00:00:00Z
+labels: ["mvp"]
+type: feature
+weight: 10
+---
+"""
+
+[test.inputs]
+path = "full"
+
+[test.expect]
+canonical_path = "full"
+fields_present = ["created_at", "due", "assignee", "dependencies", "summary", "estimate", "status", "updated_at", "change_log", "labels", "type", "weight"]
