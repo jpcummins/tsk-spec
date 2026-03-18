@@ -8,6 +8,7 @@ tsk search uses a DSL for filtering tasks, iterations, and SLA results.
 - Use `task.*`, `iteration.*`, and `sla.*` when needed.
 - Boolean operators: `AND`, `OR`, `NOT`.
 - Operator precedence: `NOT` > `AND` > `OR`.
+- Predicates against missing fields evaluate to false. For example, a task without `created_at` won't match `created_at > date("yesterday")`.
 
 ## Common Operators
 

@@ -66,7 +66,7 @@ severity = "critical"
 [[rule]]
 id = "support-7d"
 name = "Support bugs resolved in 7 days"
-query = 'task.labels ~ "support"'
+query = 'has(labels, "support")'
 target = "7d"
 start = "status:in_progress"
 stop = "status:done"

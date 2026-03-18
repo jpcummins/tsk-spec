@@ -33,11 +33,11 @@ A simple tsk repository looks like this:
 
 Optionally, you can add additional functionality (see [shopping cart example](example/complex-shopping-cart/)):
 
-* teams
-* iterations
-* SLAs
+* [teams](docs/teams.md)
+* [iterations](docs/iterations.md)
+* [SLAs](docs/sla.md)
 
-The primary way to interact with tsk is via the query interface, though, implementations are free to abstract this away to make a clean UI for non-technical users. For example, to find all open bugs in the `support` project:
+The primary way to interact with tsk is via the [query interface](docs/search.md), though, implementations are free to abstract this away to make a clean UI for non-technical users. For example, to find all open bugs in the `support` project:
 
 ```
 path ~ "support/" AND status.category != done

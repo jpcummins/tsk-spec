@@ -8,11 +8,13 @@ This directory contains human-friendly guides for the tsk format.
 
 ## Start Here
 
-1. `docs/basics.md` - Repository layout, tasks, front matter, identifiers.
-2. `docs/config.md` - Configuration, status maps.
-3. `docs/teams.md` - Team structure and member identifiers.
-4. `docs/sla.md` - SLA rules, timing, and status outcomes.
-5. `docs/search.md` - Query language guide and practical examples.
+1. [docs/basics.md](basics.md) - Core idea and quick example
+2. [docs/tasks.md](tasks.md) - Task files and front matter
+3. [docs/projects.md](projects.md) - Directory structure and nested projects
+4. [docs/teams.md](teams.md) - Team structure and member identifiers
+5. [docs/search.md](search.md) - Query language
+6. [docs/sla.md](sla.md) - SLA rules
+7. [docs/config.md](config.md) - Configuration and status maps
 
 ## Real-World Examples
 

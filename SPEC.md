@@ -116,19 +116,16 @@ redirect_to: platform/tasks/enable-sso
 
 - Base categories: `todo`, `in_progress`, `done`.
 - Custom statuses must map to a base category in config.
-- Status is always explicit on the task.
+- Status is optional; if not defined, the task will not appear in status-based searches.
 - Iterations use the same base categories but have a separate status mapping.
 
 ### 1.5 Task Entity
 
 Tasks are the atomic unit. A task is a Markdown file with front matter.
 
-#### Required fields
-
-- `created_at` (RFC3339 timestamp)
-
 #### Optional fields
 
+- `created_at` (RFC3339 timestamp). If not defined, the task will not appear in date-based searches.
 - `due` (RFC3339 timestamp)
 - `assignee` (string; a person or team — see **Assignee Semantics**)
 - `dependencies` (canonical paths relative to `tasks/`, without file extensions)
